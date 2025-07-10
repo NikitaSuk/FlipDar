@@ -239,7 +239,6 @@ export default function Home() {
     <div className={`min-h-screen ${bgGradient} flex flex-col items-center transition-colors`}>
       <header className="w-full py-8 flex flex-col items-center">
         <h1 className="text-4xl font-extrabold text-gray-800 mb-2 drop-shadow tracking-tight">Welcome to FlipFlop!</h1>
-        <button onClick={handleSignOut} className="btn-primary mb-4">Sign Out</button>
       </header>
       <main className="w-full max-w-4xl flex flex-col md:flex-row gap-10">
         {/* Search and Results */}

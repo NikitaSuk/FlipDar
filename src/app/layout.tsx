@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SupabaseProvider from './SupabaseProvider';
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <SupabaseProvider>
-          {children}
+          <nav className="w-full flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur border-b border-gray-200 fixed top-0 left-0 z-50">
+            <Link href="/" className="text-2xl font-bold text-gray-800 tracking-tight">FlipFlop</Link>
+            <div className="flex items-center gap-4">
+              <Link href="/account" className="btn-primary">Account</Link>
+            </div>
+          </nav>
+          <div className="pt-20">{children}</div>
         </SupabaseProvider>
       </body>
     </html>
