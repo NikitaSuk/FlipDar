@@ -1,7 +1,9 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useState, useEffect } from 'react';
+import Fuse from 'fuse.js';
 
 // Default trending items (fallback)
 const defaultTrendingItems = [
@@ -32,6 +34,11 @@ export default function Home() {
     fastestFlip: 2,
     userCountries: 30
   });
+
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [fuse, setFuse] = useState<any>(null);
 
   // Fetch trending items and stats
   const fetchTrendingData = async () => {
@@ -67,6 +74,25 @@ export default function Home() {
       setTrendingLoading(false);
     }
   };
+
+  // Fetch suggestions on mount
+  useEffect(() => {
+    fetch('/api/suggestions')
+      .then(res => res.json())
+      .then(data => {
+        setSuggestions(data.suggestions || []);
+        setFuse(new Fuse(data.suggestions || [], { threshold: 0.4 }));
+      });
+  }, []);
+
+  // Update filtered suggestions as user types
+  useEffect(() => {
+    if (item && fuse) {
+      setFilteredSuggestions(fuse.search(item).map((r: any) => r.item).slice(0, 8));
+    } else {
+      setFilteredSuggestions([]);
+    }
+  }, [item, fuse]);
 
   useEffect(() => {
     fetchTrendingData();
@@ -229,7 +255,15 @@ export default function Home() {
             </div>
           )}
         </section>
-        <footer className="w-full py-6 text-center text-gray-400 text-sm border-t mt-auto">© {new Date().getFullYear()} FlipFlop. All rights reserved.</footer>
+        <footer className="w-full py-6 text-center text-gray-400 text-sm border-t mt-auto">
+          <div className="flex flex-col items-center gap-2">
+            <div>© {new Date().getFullYear()} FlipFlop. All rights reserved.</div>
+            <div className="flex gap-4 text-xs">
+              <Link href="/privacy" className="hover:text-gray-600 transition">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-gray-600 transition">Terms of Service</Link>
+            </div>
+          </div>
+        </footer>
       </div>
     );
   }
@@ -244,14 +278,32 @@ export default function Home() {
         {/* Search and Results */}
         <section className="flex-1 glass-card p-8 mb-8 md:mb-0">
           <form onSubmit={handleSearch} className="flex flex-col gap-4 mb-8">
-            <input
-              type="text"
-              placeholder="Enter item to search (e.g. iPhone 12)"
-              value={item}
-              onChange={e => setItem(e.target.value)}
-              required
-            />
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="Enter item to search (e.g. iPhone 12)"
+                value={item}
+                onChange={e => { setItem(e.target.value); setShowSuggestions(true); }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                required
+                className="w-full"
+              />
+              {showSuggestions && filteredSuggestions.length > 0 && (
+                <ul className="absolute left-0 right-0 bg-white border rounded shadow z-10 max-h-48 overflow-y-auto">
+                  {filteredSuggestions.map(s => (
+                    <li
+                      key={s}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onMouseDown={() => { setItem(s); setShowSuggestions(false); }}
+                    >
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <button type="submit" className="btn-primary w-full" disabled={loading}>
               {loading ? 'Searching...' : 'Search'}
             </button>
           </form>
@@ -269,7 +321,7 @@ export default function Home() {
         {/* Trending and Stats Panel */}
         <aside className="w-full md:w-80 flex-shrink-0 flex flex-col gap-8">
           <div className="glass-card p-6">
-            <h3 className="font-bold text-gray-700 mb-2">Trending Items</h3>
+            <h3 className="font-bold text-gray-700 mb-2">Trending Searches</h3>
             {trendingLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((i) => (
@@ -315,7 +367,15 @@ export default function Home() {
           </div>
         </aside>
       </main>
-      <footer className="w-full py-6 text-center text-gray-400 text-sm border-t mt-auto">© {new Date().getFullYear()} FlipFlop. All rights reserved.</footer>
+      <footer className="w-full py-6 text-center text-gray-400 text-sm border-t mt-auto">
+        <div className="flex flex-col items-center gap-2">
+          <div>© {new Date().getFullYear()} FlipFlop. All rights reserved.</div>
+          <div className="flex gap-4 text-xs">
+            <Link href="/privacy" className="hover:text-gray-600 transition">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-gray-600 transition">Terms of Service</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

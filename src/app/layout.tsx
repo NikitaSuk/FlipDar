@@ -27,6 +27,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <nav className="w-full flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur border-b border-gray-200 fixed top-0 left-0 z-50">
             <Link href="/" className="text-2xl font-bold text-gray-800 tracking-tight">FlipFlop</Link>
             <div className="flex items-center gap-4">
+              <Link href="/faq" className="text-gray-600 hover:text-gray-800 transition">FAQ</Link>
+              <Link href="/contact" className="text-gray-600 hover:text-gray-800 transition">Contact</Link>
               <Link href="/account" className="btn-primary">Account</Link>
             </div>
           </nav>

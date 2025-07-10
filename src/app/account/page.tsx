@@ -45,10 +45,21 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (session === undefined) return; // Wait for session to resolve
-    if (!session) {
-      router.push('/');
-    }
-    setChecked(true);
+    
+    // Add a longer delay to allow session to fully load and stabilize
+    const timer = setTimeout(() => {
+      // Only redirect if we're absolutely certain there's no session
+      // and we've given enough time for the session to load
+      if (session === null) {
+        console.log('No session found, redirecting to home');
+        router.push('/');
+      } else {
+        console.log('Session found, staying on account page');
+      }
+      setChecked(true);
+    }, 500); // Increased delay to 500ms
+    
+    return () => clearTimeout(timer);
   }, [session, router]);
 
   // Fetch history
@@ -58,29 +69,10 @@ export default function AccountPage() {
     setError('');
     const fetchHistory = async () => {
       try {
-        const res = await fetch('/api/account/history'); // You can implement this API for privacy
+        const res = await fetch(`/api/account/history?userId=${session.user.id}`);
         if (!res.ok) throw new Error('Failed to fetch search history');
         const data = await res.json();
         setSearchHistory(data.history || []);
-        // Calculate stats
-        let totalSold = 0;
-        let totalMade = 0;
-        let profitMap: Record<string, number> = {};
-        (data.history || []).forEach((row: any) => {
-          if (row.result_count && row.avg_price) {
-            totalSold += row.result_count;
-            const made = row.result_count * row.avg_price;
-            totalMade += made;
-            profitMap[row.item] = (profitMap[row.item] || 0) + made;
-          }
-        });
-        let mostProfitable: null | { item: string, total: number } = null;
-        for (const [item, total] of Object.entries(profitMap)) {
-          if (!mostProfitable || total > mostProfitable.total) {
-            mostProfitable = { item, total };
-          }
-        }
-        setStats({ totalSold, totalMade, mostProfitable });
       } catch (err: any) {
         setError(err.message || 'Failed to fetch search history');
       } finally {
@@ -95,7 +87,7 @@ export default function AccountPage() {
     if (!session) return;
     setTxLoading(true);
     setTxError('');
-    fetch('/api/transactions')
+    fetch(`/api/transactions?userId=${session.user.id}`)
       .then(res => res.json())
       .then(data => {
         if (data.error) throw new Error(data.error);
@@ -157,6 +149,7 @@ export default function AccountPage() {
   // Add transaction handler
   const handleAddTransaction = async (e: any) => {
     e.preventDefault();
+    if (!session) return;
     setFormLoading(true);
     setFormError('');
     try {
@@ -164,6 +157,7 @@ export default function AccountPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: session.user.id,
           ...form,
           price: parseFloat(form.price),
           date: form.date || new Date().toISOString(),
@@ -184,10 +178,11 @@ export default function AccountPage() {
   // Edit transaction handler
   const handleEditTransaction = async (e: any) => {
     e.preventDefault();
+    if (!session) return;
     setEditLoading(true);
     setEditError('');
     try {
-      const res = await fetch(`/api/transactions?id=${editTx.id}`, {
+      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -209,12 +204,12 @@ export default function AccountPage() {
 
   // Delete transaction handler
   const handleDeleteTransaction = async () => {
-    if (!editTx) return;
+    if (!editTx || !session) return;
     if (!window.confirm('Are you sure you want to delete this transaction?')) return;
     setEditLoading(true);
     setEditError('');
     try {
-      const res = await fetch(`/api/transactions?id=${editTx.id}`, {
+      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete transaction');
@@ -228,7 +223,14 @@ export default function AccountPage() {
   };
 
   if (session === undefined || !checked) {
-    return <div className="text-center py-10">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your account...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!session) return null;
