@@ -123,24 +123,6 @@ export default function Home() {
         setError('You must accept the Privacy Policy and Terms of Service.');
         return;
       }
-      // Check username uniqueness via API
-      try {
-        const response = await fetch('/api/check-username', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: username.trim() })
-        });
-        const data = await response.json();
-        
-        if (!data.available) {
-          setError(data.message || 'Username is already taken. Please choose a different one.');
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking username:', error);
-        setError('Failed to check username availability. Please try again.');
-        return;
-      }
     }
     let result;
     console.log('supabase.auth:', supabase.auth); // DEBUG
