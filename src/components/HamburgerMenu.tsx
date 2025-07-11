@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
+import Image from 'next/image';
 
 function HamburgerIcon({ open }: { open: boolean }) {
   // SVG path morphs between hamburger and X
@@ -124,9 +125,35 @@ export default function HamburgerMenu() {
       >
         {/* User Info */}
         {user && (
-          <div className="px-4 py-3 border-b border-gray-100 mb-2">
-            <div className="text-sm text-gray-500">Signed in as</div>
-            <div className="font-medium text-gray-800 truncate">{user.email}</div>
+          <div className="px-4 py-4 border-b border-gray-100 mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-sm">
+                {user.user_metadata?.avatar_url ? (
+                  <Image
+                    src={user.user_metadata.avatar_url}
+                    alt="Profile"
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-500 font-semibold text-lg">
+                    {user.user_metadata?.full_name 
+                      ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+                      : user.email?.[0]?.toUpperCase() || 'U'
+                    }
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-gray-800 truncate">
+                  {user.user_metadata?.full_name || 'User'}
+                </div>
+                <div className="text-sm text-gray-500 truncate">
+                  {user.user_metadata?.username ? `@${user.user_metadata.username}` : user.email}
+                </div>
+              </div>
+            </div>
           </div>
         )}
         {/* Menu Items */}

@@ -5,6 +5,7 @@ import SupabaseProvider from './SupabaseProvider';
 import Link from "next/link";
 import Image from "next/image";
 import HamburgerMenu from '../components/HamburgerMenu';
+import AccountCircle from '../components/AccountCircle';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="text-2xl font-bold text-gray-800 tracking-tight">FlipDar</span>
             </Link>
             <div className="flex items-center gap-4">
-              <Link href="/account" className="btn-primary">Account</Link>
+              <AccountCircle />
               <HamburgerMenu />
             </div>
           </nav>

@@ -39,6 +39,9 @@ export default function Home() {
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [fuse, setFuse] = useState<any>(null);
+  const [username, setUsername] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [acceptedTos, setAcceptedTos] = useState(false);
 
   // Fetch trending items and stats
   const fetchTrendingData = async () => {
@@ -107,12 +110,50 @@ export default function Home() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (authMode === 'sign-up') {
+      if (!username.trim()) {
+        setError('Username is required.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.');
+        return;
+      }
+      if (!acceptedTos) {
+        setError('You must accept the Privacy Policy and Terms of Service.');
+        return;
+      }
+      // Check username uniqueness via API
+      try {
+        const response = await fetch('/api/check-username', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username.trim() })
+        });
+        const data = await response.json();
+        
+        if (!data.available) {
+          setError(data.message || 'Username is already taken. Please choose a different one.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking username:', error);
+        setError('Failed to check username availability. Please try again.');
+        return;
+      }
+    }
     let result;
     console.log('supabase.auth:', supabase.auth); // DEBUG
     if (authMode === 'sign-in') {
       result = await supabase.auth.signInWithPassword({ email, password });
     } else {
-      result = await supabase.auth.signUp({ email, password });
+      result = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username: username.trim().toLowerCase() }
+        }
+      });
     }
     if (result.error) setError(result.error.message);
   };
@@ -201,6 +242,36 @@ export default function Home() {
                 onChange={e => setPassword(e.target.value)}
                 required
               />
+              {authMode === 'sign-up' && (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                  <label className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                    <input
+                      type="checkbox"
+                      checked={acceptedTos}
+                      onChange={e => setAcceptedTos(e.target.checked)}
+                      required
+                    />
+                    I agree to the
+                    <Link href="/privacy" className="underline hover:text-green-700">Privacy Policy</Link>
+                    and
+                    <Link href="/terms" className="underline hover:text-green-700">Terms of Service</Link>
+                  </label>
+                </>
+              )}
               <button type="submit" className="btn-primary">
                 {authMode === 'sign-in' ? 'Sign In' : 'Sign Up'}
               </button>
