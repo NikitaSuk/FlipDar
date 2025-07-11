@@ -12,6 +12,9 @@ const SortIcon = () => <span className="inline-block w-4 h-4 mr-2">↕️</span>
 type SortField = 'date' | 'price' | 'item' | 'type' | 'platform';
 type SortDirection = 'asc' | 'desc';
 
+const platforms = ["eBay", "Facebook Marketplace", "Craigslist", "OfferUp", "Mercari", "Other"];
+const conditions = ["New", "Like New", "Used", "For Parts", "Other"];
+
 export default function TransactionsPage() {
   const { session, isLoading } = useProtectedRoute();
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -20,6 +23,20 @@ export default function TransactionsPage() {
   const [platformFilter, setPlatformFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  
+  // Edit modal state
+  const [editTx, setEditTx] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({
+    type: 'purchase',
+    item: '',
+    price: '',
+    date: '',
+    platform: '',
+    condition: '',
+    notes: ''
+  });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState('');
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -32,7 +49,7 @@ export default function TransactionsPage() {
   }, [session]);
 
   // Get unique platforms for filter dropdown
-  const platforms = ['all', ...Array.from(new Set(transactions.map(tx => tx.platform).filter(Boolean)))];
+  const uniquePlatforms = ['all', ...Array.from(new Set(transactions.map(tx => tx.platform).filter(Boolean)))];
 
   // Filter transactions based on selected filters
   const filteredTransactions = transactions.filter(tx => {
@@ -92,6 +109,71 @@ export default function TransactionsPage() {
   };
 
   const hasActiveFilters = typeFilter !== 'all' || platformFilter !== 'all';
+
+  // Edit transaction handler
+  const handleEditTransaction = async (e: any) => {
+    e.preventDefault();
+    if (!session || !editTx) return;
+    setEditLoading(true);
+    setEditError('');
+    try {
+      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          ...editForm,
+          price: parseFloat(editForm.price),
+          date: editForm.date || new Date().toISOString(),
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update transaction');
+      setTransactions(transactions.map(tx => tx.id === editTx.id ? data.transaction : tx));
+      setEditTx(null);
+    } catch (err: any) {
+      setEditError(err.message || 'Failed to update transaction');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  // Delete transaction handler
+  const handleDeleteTransaction = async () => {
+    if (!editTx || !session) return;
+    if (!window.confirm('Are you sure you want to delete this transaction?')) return;
+    setEditLoading(true);
+    setEditError('');
+    try {
+      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
+        method: 'DELETE',
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+      });
+      if (!res.ok) throw new Error('Failed to delete transaction');
+      setTransactions(transactions.filter(tx => tx.id !== editTx.id));
+      setEditTx(null);
+    } catch (err: any) {
+      setEditError(err.message || 'Failed to delete transaction');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const openEditModal = (transaction: any) => {
+    setEditTx(transaction);
+    setEditForm({
+      type: transaction.type,
+      item: transaction.item,
+      price: transaction.price.toString(),
+      date: transaction.date ? transaction.date.split('T')[0] : '',
+      platform: transaction.platform || '',
+      condition: transaction.condition || '',
+      notes: transaction.notes || ''
+    });
+    setEditError('');
+  };
 
   if (isLoading) {
     return (
@@ -174,7 +256,7 @@ export default function TransactionsPage() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Platform</label>
                 <div className="space-y-2">
-                  {platforms.map(platform => {
+                  {uniquePlatforms.map(platform => {
                     const count = transactions.filter(tx => 
                       platform === 'all' ? true : tx.platform === platform
                     ).length;
@@ -299,6 +381,9 @@ export default function TransactionsPage() {
                             {sortField === 'date' && <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
                           </div>
                         </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -311,6 +396,14 @@ export default function TransactionsPage() {
                           <td className="px-4 py-3 text-gray-800 font-semibold">${parseFloat(tx.price).toFixed(2)}</td>
                           <td className="px-4 py-3 text-gray-600">{tx.platform || '—'}</td>
                           <td className="px-4 py-3 text-gray-600">{new Date(tx.date).toLocaleDateString()}</td>
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => openEditModal(tx)}
+                              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              Edit
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -321,6 +414,101 @@ export default function TransactionsPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Transaction Modal */}
+      {editTx && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
+            <button 
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl" 
+              onClick={() => setEditTx(null)}
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold mb-4">Edit Transaction</h2>
+            <form onSubmit={handleEditTransaction} className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <select 
+                  className="flex-1 rounded border p-2" 
+                  value={editForm.type} 
+                  onChange={e => setEditForm(f => ({ ...f, type: e.target.value }))}
+                >
+                  <option value="purchase">Purchase</option>
+                  <option value="sale">Sale</option>
+                </select>
+                <input 
+                  className="flex-1 rounded border p-2" 
+                  placeholder="Item" 
+                  value={editForm.item} 
+                  onChange={e => setEditForm(f => ({ ...f, item: e.target.value }))} 
+                  required 
+                />
+              </div>
+              <div className="flex gap-2">
+                <input 
+                  className="flex-1 rounded border p-2" 
+                  type="number" 
+                  min="0" 
+                  step="0.01" 
+                  placeholder="Price" 
+                  value={editForm.price} 
+                  onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))} 
+                  required 
+                />
+                <input 
+                  className="flex-1 rounded border p-2" 
+                  type="date" 
+                  value={editForm.date} 
+                  onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))} 
+                />
+              </div>
+              <div className="flex gap-2">
+                <select 
+                  className="flex-1 rounded border p-2" 
+                  value={editForm.platform} 
+                  onChange={e => setEditForm(f => ({ ...f, platform: e.target.value }))}
+                >
+                  <option value="">Platform</option>
+                  {platforms.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <select 
+                  className="flex-1 rounded border p-2" 
+                  value={editForm.condition} 
+                  onChange={e => setEditForm(f => ({ ...f, condition: e.target.value }))}
+                >
+                  <option value="">Condition</option>
+                  {conditions.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <textarea 
+                className="rounded border p-2" 
+                placeholder="Notes (optional)" 
+                value={editForm.notes} 
+                onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} 
+                rows={3}
+              />
+              {editError && <div className="text-red-500 text-sm text-center">{editError}</div>}
+              <div className="flex gap-2 mt-2">
+                <button 
+                  type="submit" 
+                  className="btn-primary flex-1" 
+                  disabled={editLoading}
+                >
+                  {editLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button 
+                  type="button" 
+                  className="text-red-500 btn-danger flex-1" 
+                  disabled={editLoading} 
+                  onClick={handleDeleteTransaction}
+                >
+                  Delete
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
