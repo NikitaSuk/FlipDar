@@ -3,6 +3,7 @@ import { useSession } from '@supabase/auth-helpers-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
 
 const GearIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">⚙️</span>;
 const BellIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🔔</span>;
@@ -11,9 +12,7 @@ const PaletteIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middl
 const GlobeIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🌐</span>;
 
 export default function SettingsPage() {
-  const session = useSession();
-  const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { session, isLoading } = useProtectedRoute();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     pushNotifications: false,
@@ -25,21 +24,13 @@ export default function SettingsPage() {
     dataSharing: false
   });
 
-  useEffect(() => {
-    if (session === undefined) return;
-    if (session === null) {
-      router.push('/');
-    }
-    setChecked(true);
-  }, [session, router]);
-
   const handleSettingChange = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
     // Here you would typically save to database
     console.log(`Setting ${key} changed to ${value}`);
   };
 
-  if (session === undefined || !checked) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -50,7 +41,9 @@ export default function SettingsPage() {
     );
   }
 
-  if (!session) return null;
+  if (!session) {
+    return null; // This will be handled by useProtectedRoute
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">

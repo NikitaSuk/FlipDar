@@ -3,25 +3,16 @@ import { useSession } from '@supabase/auth-helpers-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
 
 const CrownIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">👑</span>;
 const CheckIcon = () => <span className="inline-block w-4 h-4 text-green-500">✓</span>;
 const StarIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">⭐</span>;
 
 export default function SubscriptionPage() {
-  const session = useSession();
-  const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { session, isLoading } = useProtectedRoute();
   const [currentPlan, setCurrentPlan] = useState('free');
   const [billingCycle, setBillingCycle] = useState('monthly');
-
-  useEffect(() => {
-    if (session === undefined) return;
-    if (session === null) {
-      router.push('/');
-    }
-    setChecked(true);
-  }, [session, router]);
 
   const plans = [
     {
@@ -30,7 +21,7 @@ export default function SubscriptionPage() {
       price: 0,
       period: 'forever',
       features: [
-        '5 searches per day',
+        '10 searches per day',
         'Basic market insights',
         'Standard support',
         'Mobile app access'
@@ -40,30 +31,30 @@ export default function SubscriptionPage() {
     {
       id: 'pro',
       name: 'Pro',
-      price: billingCycle === 'monthly' ? 9.99 : 99.99,
+      price: billingCycle === 'monthly' ? 4.99 : 49.99,
       period: billingCycle === 'monthly' ? 'month' : 'year',
       features: [
-        'Unlimited searches',
-        'Advanced analytics',
+        '100 searches per day',
+        'Advanced market insights',
         'Priority support',
-        'Export data',
-        'Custom alerts',
-        'API access'
+        'Export data to CSV',
+        'Price alerts',
+        'Trend analysis'
       ],
       popular: true
     },
     {
       id: 'enterprise',
       name: 'Enterprise',
-      price: billingCycle === 'monthly' ? 29.99 : 299.99,
+      price: billingCycle === 'monthly' ? 14.99 : 149.99,
       period: billingCycle === 'monthly' ? 'month' : 'year',
       features: [
         'Everything in Pro',
-        'Team collaboration',
-        'White-label options',
-        'Dedicated support',
-        'Custom integrations',
-        'Advanced reporting'
+        'Unlimited searches',
+        'Bulk data export',
+        'Advanced analytics',
+        'Custom reports',
+        'API access'
       ],
       popular: false
     }
@@ -80,7 +71,7 @@ export default function SubscriptionPage() {
     alert(`This would redirect to payment for ${planId} plan`);
   };
 
-  if (session === undefined || !checked) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -91,7 +82,9 @@ export default function SubscriptionPage() {
     );
   }
 
-  if (!session) return null;
+  if (!session) {
+    return null; // This will be handled by useProtectedRoute
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">
@@ -165,10 +158,10 @@ export default function SubscriptionPage() {
               } ${currentPlan === plan.id ? 'border-2 border-green-500' : ''}`}
             >
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center">
-                    <StarIcon />
-                    Most Popular
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium flex items-center shadow-md whitespace-nowrap min-w-max">
+                    <span className="mr-2"><StarIcon /></span>
+                    <span className="tracking-tight">Most Popular</span>
                   </div>
                 </div>
               )}
@@ -211,20 +204,55 @@ export default function SubscriptionPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-12 bg-white rounded-2xl shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-medium text-gray-800 mb-2">Can I cancel anytime?</h3>
-              <p className="text-gray-600">Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
+        <div className="mt-12 bg-white rounded-2xl shadow p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Frequently Asked Questions</h2>
+            <p className="text-gray-600">Everything you need to know about FlipDar subscriptions</p>
+          </div>
+          <div className="space-y-6">
+            <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-green-600 text-sm font-bold">?</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2 text-lg">Can I cancel anytime?</h3>
+                  <p className="text-gray-600 leading-relaxed">Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 className="font-medium text-gray-800 mb-2">What payment methods do you accept?</h3>
-              <p className="text-gray-600">We accept all major credit cards, PayPal, and Apple Pay.</p>
+            <div className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 text-sm font-bold">$</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2 text-lg">What payment methods do you accept?</h3>
+                  <p className="text-gray-600 leading-relaxed">We accept all major credit cards, PayPal, and Apple Pay for your convenience.</p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 className="font-medium text-gray-800 mb-2">Is there a free trial?</h3>
-              <p className="text-gray-600">Yes, all paid plans come with a 7-day free trial. No credit card required to start.</p>
+            <div className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span className="text-purple-600 text-sm font-bold">✓</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2 text-lg">Is there a free trial?</h3>
+                  <p className="text-gray-600 leading-relaxed">Yes, all paid plans come with a 3-day free trial. No credit card required to start exploring FlipDar's features.</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                  <span className="text-orange-600 text-sm font-bold">⚡</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-800 mb-2 text-lg">How quickly can I start using FlipDar?</h3>
+                  <p className="text-gray-600 leading-relaxed">You can start using FlipDar immediately after signing up. No setup required - just search and analyze!</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useSession } from '@supabase/auth-helpers-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
 
 const ChartIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📊</span>;
 const TrendingIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📈</span>;
@@ -10,21 +11,11 @@ const CalendarIcon = () => <span className="inline-block w-5 h-5 mr-2 align-midd
 const TargetIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🎯</span>;
 
 export default function AnalyticsPage() {
-  const session = useSession();
-  const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { session, isLoading } = useProtectedRoute();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [searchHistory, setSearchHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('30d'); // 7d, 30d, 90d, 1y
-
-  useEffect(() => {
-    if (session === undefined) return;
-    if (session === null) {
-      router.push('/');
-    }
-    setChecked(true);
-  }, [session, router]);
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -95,7 +86,7 @@ export default function AnalyticsPage() {
 
   const analytics = calculateAnalytics();
 
-  if (session === undefined || !checked) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -106,7 +97,9 @@ export default function AnalyticsPage() {
     );
   }
 
-  if (!session) return null;
+  if (!session) {
+    return null; // This will be handled by useProtectedRoute
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">

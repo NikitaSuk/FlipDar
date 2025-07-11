@@ -3,21 +3,14 @@ import { useSession } from '@supabase/auth-helpers-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
 
 const TransactionIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📝</span>;
 
 export default function TransactionsPage() {
-  const session = useSession();
-  const router = useRouter();
+  const { session, isLoading } = useProtectedRoute();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (session === undefined) return;
-    if (session === null) {
-      router.push('/');
-    }
-  }, [session, router]);
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -29,7 +22,7 @@ export default function TransactionsPage() {
       .finally(() => setLoading(false));
   }, [session]);
 
-  if (session === undefined) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50">
         <div className="text-center">
@@ -40,7 +33,9 @@ export default function TransactionsPage() {
     );
   }
 
-  if (!session) return null;
+  if (!session) {
+    return null; // This will be handled by useProtectedRoute
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">

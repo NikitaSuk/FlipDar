@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { useProtectedRoute } from '../../hooks/useProtectedRoute';
 
 const GearIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">⚙️</span>;
 const ChartIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📊</span>;
@@ -16,9 +17,7 @@ const conditions = ["New", "Like New", "Used", "For Parts", "Other"];
 type MostProfitable = { item: string; total: number; sale: number; purchase: number } | null;
 
 export default function AccountPage() {
-  const session = useSession();
-  const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { session, isLoading } = useProtectedRoute();
   const [searchHistory, setSearchHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -42,25 +41,6 @@ export default function AccountPage() {
   const [editForm, setEditForm] = useState(form);
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
-
-  useEffect(() => {
-    if (session === undefined) return; // Wait for session to resolve
-    
-    // Add a longer delay to allow session to fully load and stabilize
-    const timer = setTimeout(() => {
-      // Only redirect if we're absolutely certain there's no session
-      // and we've given enough time for the session to load
-      if (session === null) {
-        console.log('No session found, redirecting to home');
-        router.push('/');
-      } else {
-        console.log('Session found, staying on account page');
-      }
-      setChecked(true);
-    }, 500); // Increased delay to 500ms
-    
-    return () => clearTimeout(timer);
-  }, [session, router]);
 
   // Fetch history
   useEffect(() => {
@@ -222,7 +202,7 @@ export default function AccountPage() {
     }
   };
 
-  if (session === undefined || !checked) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -233,7 +213,9 @@ export default function AccountPage() {
     );
   }
 
-  if (!session) return null;
+  if (!session) {
+    return null; // This will be handled by useProtectedRoute
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">
@@ -244,7 +226,7 @@ export default function AccountPage() {
             {session.user.email?.[0]?.toUpperCase()}
           </div>
           <div className="font-bold text-lg text-gray-800 mb-1">{session.user.email}</div>
-          <Link href="/account/profile" className="text-green-600 text-sm hover:underline mb-2">View profile</Link>
+          <Link href="/account/profile" className="text-gray-400 text-sm hover:underline mb-2">Edit profile</Link>
         </div>
         {/* Account Options List */}
         <div className="bg-white rounded-2xl shadow divide-y divide-gray-100 mb-6">

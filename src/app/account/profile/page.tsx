@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
 
 const UserIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">👤</span>;
 const CameraIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📷</span>;
@@ -19,9 +20,7 @@ interface ProfileData {
 }
 
 export default function ProfilePage() {
-  const session = useSession();
-  const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { session, isLoading } = useProtectedRoute();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -34,14 +33,6 @@ export default function ProfilePage() {
     phone: '',
     avatar_url: ''
   });
-
-  useEffect(() => {
-    if (session === undefined) return;
-    if (session === null) {
-      router.push('/');
-    }
-    setChecked(true);
-  }, [session, router]);
 
   useEffect(() => {
     if (session?.user) {
@@ -94,7 +85,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (session === undefined || !checked) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -105,7 +96,9 @@ export default function ProfilePage() {
     );
   }
 
-  if (!session) return null;
+  if (!session) {
+    return null; // This will be handled by useProtectedRoute
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">

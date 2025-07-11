@@ -39,9 +39,9 @@ export default function HamburgerMenu() {
       { href: '/account', label: 'Dashboard', icon: '📊' },
     ]},
     { section: 'Account', items: [
+      { href: '/account/subscription', label: 'Subscription', icon: '💳' },
       { href: '/account/analytics', label: 'Analytics', icon: '📈' },
       { href: '/account/transactions', label: 'All Transactions', icon: '📝' },
-      { href: '/account/subscription', label: 'Subscription', icon: '💳' },
       { href: '/account/settings', label: 'Settings', icon: '⚙️' },
     ]},
     { section: 'Support', items: [
