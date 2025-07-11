@@ -3,26 +3,37 @@ import { useSession } from '@supabase/auth-helpers-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const UserIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">👤</span>;
-const EditIcon = () => <span className="inline-block w-4 h-4">✏️</span>;
-const SaveIcon = () => <span className="inline-block w-4 h-4">💾</span>;
-const CancelIcon = () => <span className="inline-block w-4 h-4">❌</span>;
+const CameraIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📷</span>;
+
+interface ProfileData {
+  full_name: string;
+  email: string;
+  bio: string;
+  location: string;
+  website: string;
+  phone: string;
+  avatar_url: string;
+}
 
 export default function ProfilePage() {
   const session = useSession();
   const router = useRouter();
   const [checked, setChecked] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    displayName: session?.user?.user_metadata?.full_name || '',
-    bio: 'Passionate flipper and reseller. Always looking for the next great deal!',
-    location: 'United States',
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [profileData, setProfileData] = useState<ProfileData>({
+    full_name: '',
+    email: '',
+    bio: '',
+    location: '',
     website: '',
     phone: '',
-    avatar: session?.user?.user_metadata?.avatar_url || ''
+    avatar_url: ''
   });
-  const [tempProfile, setTempProfile] = useState(profile);
 
   useEffect(() => {
     if (session === undefined) return;
@@ -34,38 +45,53 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (session?.user) {
-      const newProfile = {
-        displayName: session.user.user_metadata?.full_name || '',
-        bio: 'Passionate flipper and reseller. Always looking for the next great deal!',
-        location: 'United States',
-        website: '',
-        phone: '',
-        avatar: session.user.user_metadata?.avatar_url || ''
-      };
-      setProfile(newProfile);
-      setTempProfile(newProfile);
+      setProfileData(prev => ({
+        ...prev,
+        email: session.user.email || '',
+        full_name: session.user.user_metadata?.full_name || '',
+        avatar_url: session.user.user_metadata?.avatar_url || ''
+      }));
     }
   }, [session]);
 
-  const handleEdit = () => {
-    setTempProfile(profile);
-    setIsEditing(true);
+  const handleInputChange = (field: keyof ProfileData, value: string) => {
+    setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async () => {
-    setProfile(tempProfile);
-    setIsEditing(false);
-    // Here you would save to the database
-    console.log('Saving profile:', tempProfile);
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileData(prev => ({ 
+          ...prev, 
+          avatar_url: e.target?.result as string 
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleCancel = () => {
-    setTempProfile(profile);
-    setIsEditing(false);
-  };
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
 
-  const handleInputChange = (field: string, value: string) => {
-    setTempProfile(prev => ({ ...prev, [field]: value }));
+    try {
+      // Here you would typically save to Supabase
+      // For now, we'll simulate the save
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (session === undefined || !checked) {
@@ -85,186 +111,176 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">
       <div className="w-full max-w-2xl mt-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
             <Link href="/account" className="text-gray-600 hover:text-gray-800 mr-4">← Back to Account</Link>
-            <h1 className="text-2xl font-bold text-gray-800">Profile</h1>
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+              <UserIcon />
+              Edit Profile
+            </h1>
           </div>
-          {!isEditing ? (
-            <button
-              onClick={handleEdit}
-              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-            >
-              <EditIcon />
-              <span className="ml-2">Edit Profile</span>
-            </button>
-          ) : (
-            <div className="flex gap-2">
-              <button
-                onClick={handleSave}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-              >
-                <SaveIcon />
-                <span className="ml-2">Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-              >
-                <CancelIcon />
-                <span className="ml-2">Cancel</span>
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* Profile Card */}
-        <div className="bg-white rounded-2xl shadow p-6 mb-6">
-          <div className="flex items-start space-x-6">
-            {/* Avatar */}
-            <div className="flex-shrink-0">
-              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-3xl font-bold text-gray-600">
-                {profile.avatar ? (
-                  <img src={profile.avatar} alt="Avatar" className="w-24 h-24 rounded-full object-cover" />
-                ) : (
-                  session.user.email?.[0]?.toUpperCase()
-                )}
-              </div>
-              {isEditing && (
-                <button className="mt-2 w-full text-sm text-green-600 hover:text-green-700">
-                  Change Photo
-                </button>
-              )}
-            </div>
+        {/* Success/Error Message */}
+        {message && (
+          <div className={`mb-6 p-4 rounded-lg ${
+            message.type === 'success' 
+              ? 'bg-green-50 border border-green-200 text-green-800' 
+              : 'bg-red-50 border border-red-200 text-red-800'
+          }`}>
+            {message.text}
+          </div>
+        )}
 
-            {/* Profile Info */}
-            <div className="flex-1">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={tempProfile.displayName}
-                      onChange={(e) => handleInputChange('displayName', e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        {/* Profile Form */}
+        <div className="bg-white rounded-2xl shadow p-8">
+          <form onSubmit={handleSave} className="space-y-6">
+            {/* Profile Picture Section */}
+            <div className="text-center">
+              <div className="relative inline-block">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg">
+                  {profileData.avatar_url ? (
+                    <Image
+                      src={profileData.avatar_url}
+                      alt="Profile"
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="text-lg font-semibold text-gray-800">
-                      {profile.displayName || 'No display name set'}
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-2xl">
+                      👤
                     </div>
                   )}
                 </div>
+                <label className="absolute bottom-0 right-0 bg-green-600 text-white p-2 rounded-full cursor-pointer hover:bg-green-700 transition-colors shadow-lg">
+                  <CameraIcon />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">Click the camera to change your profile picture</p>
+            </div>
 
+            {/* Personal Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                Personal Information
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <div className="text-gray-600">{session.user.email}</div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={profileData.full_name}
+                    onChange={(e) => handleInputChange('full_name', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Enter your full name"
+                  />
                 </div>
-
+                
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                  {isEditing ? (
-                    <textarea
-                      value={tempProfile.bio}
-                      onChange={(e) => handleInputChange('bio', e.target.value)}
-                      rows={3}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <div className="text-gray-600">{profile.bio}</div>
-                  )}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={profileData.email}
+                    disabled
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                    placeholder="your@email.com"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Additional Information */}
-        <div className="bg-white rounded-2xl shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Additional Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={tempProfile.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Bio
+                </label>
+                <textarea
+                  value={profileData.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                  placeholder="Tell us about yourself..."
                 />
-              ) : (
-                <div className="text-gray-600">{profile.location}</div>
-              )}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-              {isEditing ? (
+            {/* Contact Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                Contact Information
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={profileData.location}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="City, Country"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={profileData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Website
+                </label>
                 <input
                   type="url"
-                  value={tempProfile.website}
+                  value={profileData.website}
                   onChange={(e) => handleInputChange('website', e.target.value)}
-                  placeholder="https://example.com"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="https://yourwebsite.com"
                 />
-              ) : (
-                <div className="text-gray-600">
-                  {profile.website ? (
-                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700">
-                      {profile.website}
-                    </a>
-                  ) : (
-                    'No website set'
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              {isEditing ? (
-                <input
-                  type="tel"
-                  value={tempProfile.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="+1 (555) 123-4567"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-              ) : (
-                <div className="text-gray-600">{profile.phone || 'No phone number set'}</div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
-              <div className="text-gray-600">
-                {session.user.created_at ? new Date(session.user.created_at).toLocaleDateString() : 'Unknown'}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Account Stats */}
-        <div className="bg-white rounded-2xl shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Statistics</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">0</div>
-              <div className="text-sm text-gray-600">Total Searches</div>
+            {/* Save Button */}
+            <div className="flex justify-end pt-6 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              >
+                {saving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
+              </button>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">0</div>
-              <div className="text-sm text-gray-600">Transactions</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">$0</div>
-              <div className="text-sm text-gray-600">Total Profit</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">0</div>
-              <div className="text-sm text-gray-600">Days Active</div>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>

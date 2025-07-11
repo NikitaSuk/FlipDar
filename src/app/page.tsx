@@ -137,15 +137,25 @@ export default function Home() {
         setResult(data);
         // Save search to Supabase for trending analytics
         if (session?.user?.id) {
-          await supabase.from('search_history').insert({
-            user_id: session.user.id,
-            item: item,
-            avg_price: data.avgPrice,
-            min_price: data.minPrice,
-            max_price: data.maxPrice,
-            avg_duration: data.avgDuration,
-            result_count: data.count,
-          });
+          try {
+            const { error: insertError } = await supabase.from('search_history').insert({
+              user_id: session.user.id,
+              item: item,
+              avg_price: data.avgPrice,
+              min_price: data.minPrice,
+              max_price: data.maxPrice,
+              avg_duration: data.avgDuration,
+              result_count: data.count,
+            });
+            
+            if (insertError) {
+              console.error('Error saving search history:', insertError);
+            } else {
+              console.log('Search history saved successfully');
+            }
+          } catch (saveError) {
+            console.error('Error saving search history:', saveError);
+          }
         }
       } else {
         setSearchError(data.error || 'Error fetching data');
@@ -164,7 +174,16 @@ export default function Home() {
     return (
       <div className={`min-h-screen ${bgGradient} flex flex-col items-center transition-colors`}>
         <header className="w-full py-12 flex flex-col items-center">
-          <h1 className="text-6xl font-extrabold text-gray-800 mb-4 drop-shadow-lg tracking-tight">FlipFlop</h1>
+          <div className="flex items-center gap-4 mb-6">
+            <Image 
+              src="/flipdar.png" 
+              alt="FlipDar Logo" 
+              width={80} 
+              height={80} 
+              className="rounded-xl shadow-lg"
+            />
+            <h1 className="text-6xl font-extrabold text-gray-800 drop-shadow-lg tracking-tight">FlipDar</h1>
+          </div>
           <p className="text-2xl text-gray-600 mb-8 max-w-2xl text-center font-medium">The ultimate tool for resellers and flippers. Instantly analyze second-hand market trends, get real eBay stats, and discover what’s hot right now!</p>
           <div className="glass-card w-full max-w-md flex flex-col gap-2 p-8">
             <form onSubmit={handleAuth} className="flex flex-col gap-4">
@@ -257,7 +276,7 @@ export default function Home() {
         </section>
         <footer className="w-full py-6 text-center text-gray-400 text-sm border-t mt-auto">
           <div className="flex flex-col items-center gap-2">
-            <div>© {new Date().getFullYear()} FlipFlop. All rights reserved.</div>
+            <div>© {new Date().getFullYear()} FlipDar. All rights reserved.</div>
             <div className="flex gap-4 text-xs">
               <Link href="/privacy" className="hover:text-gray-600 transition">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-gray-600 transition">Terms of Service</Link>
@@ -272,7 +291,7 @@ export default function Home() {
   return (
     <div className={`min-h-screen ${bgGradient} flex flex-col items-center transition-colors`}>
       <header className="w-full py-8 flex flex-col items-center">
-        <h1 className="text-4xl font-extrabold text-gray-800 mb-2 drop-shadow tracking-tight">Welcome to FlipFlop!</h1>
+        <h1 className="text-4xl font-extrabold text-gray-800 mb-2 drop-shadow tracking-tight">Welcome to FlipDar!</h1>
       </header>
       <main className="w-full max-w-4xl flex flex-col md:flex-row gap-10">
         {/* Search and Results */}
@@ -369,7 +388,7 @@ export default function Home() {
       </main>
       <footer className="w-full py-6 text-center text-gray-400 text-sm border-t mt-auto">
         <div className="flex flex-col items-center gap-2">
-          <div>© {new Date().getFullYear()} FlipFlop. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} FlipDar. All rights reserved.</div>
           <div className="flex gap-4 text-xs">
             <Link href="/privacy" className="hover:text-gray-600 transition">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-gray-600 transition">Terms of Service</Link>

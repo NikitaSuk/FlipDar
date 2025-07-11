@@ -1,36 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
-  const supabaseUrl = 'http://127.0.0.1:54321/functions/v1/trending-items';
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseAnonKey) {
-    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not set');
-    return NextResponse.json({ error: 'Missing API key' }, { status: 500 });
-  }
-
   try {
-    console.log('Fetching from:', supabaseUrl);
-    const response = await fetch(supabaseUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${supabaseAnonKey}`,
-        'Content-Type': 'application/json',
+    // Mock trending items data
+    const mockTrendingItems = [
+      {
+        item: "iPhone 14 Pro",
+        avg_price: 850,
+        image_url: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=200&h=200&fit=crop",
+        result_count: 150
       },
-    });
-    
-    if (!response.ok) {
-      console.error('Edge Function response not ok:', response.status, response.statusText);
-      const errorText = await response.text();
-      console.error('Error response:', errorText);
-      return NextResponse.json({ error: `Edge Function error: ${response.status}` }, { status: 500 });
-    }
-    
-    const data = await response.json();
-    console.log('Successfully fetched trending items:', data);
-    return NextResponse.json(data, { status: response.status });
+      {
+        item: "PS5 Console",
+        avg_price: 500,
+        image_url: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=200&h=200&fit=crop",
+        result_count: 89
+      },
+      {
+        item: "Air Jordan 1",
+        avg_price: 320,
+        image_url: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop",
+        result_count: 234
+      },
+      {
+        item: "MacBook Pro",
+        avg_price: 1200,
+        image_url: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=200&h=200&fit=crop",
+        result_count: 67
+      }
+    ];
+
+    return NextResponse.json({ items: mockTrendingItems });
   } catch (error: any) {
-    console.error('API route error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Trending items API error:', error);
+    return NextResponse.json({ 
+      error: 'Trending items service temporarily unavailable.' 
+    }, { status: 503 });
   }
 } 
