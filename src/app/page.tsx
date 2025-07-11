@@ -235,6 +235,15 @@ export default function Home() {
                 onChange={e => setEmail(e.target.value)}
                 required
               />
+              {authMode === 'sign-up' && (
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  required
+                />
+              )}
               <input
                 type="password"
                 placeholder="Password"
@@ -244,13 +253,6 @@ export default function Home() {
               />
               {authMode === 'sign-up' && (
                 <>
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                    required
-                  />
                   <input
                     type="password"
                     placeholder="Confirm Password"
