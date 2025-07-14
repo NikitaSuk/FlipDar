@@ -100,15 +100,24 @@ export default function FAQPage() {
               <button
                 onClick={() => toggleItem(index)}
                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                aria-expanded={openItems.includes(index)}
+                aria-controls={`faq-answer-${index}`}
               >
                 <span className="font-medium text-gray-800 pr-4">{item.question}</span>
                 <ArrowIcon isOpen={openItems.includes(index)} />
               </button>
-              {openItems.includes(index) && (
-                <div className="px-6 pb-4">
-                  <p className="text-gray-600 leading-relaxed">{item.answer}</p>
-                </div>
-              )}
+              <div
+                id={`faq-answer-${index}`}
+                className={`px-6 overflow-hidden transition-all duration-400 ease-in-out ${openItems.includes(index) ? 'max-h-40 opacity-100 pb-4' : 'max-h-0 opacity-0 pb-0'}`}
+                style={{
+                  transitionProperty: 'max-height, opacity, padding-bottom',
+                }}
+                aria-hidden={!openItems.includes(index)}
+              >
+                <p className="text-gray-600 leading-relaxed">
+                  {item.answer}
+                </p>
+              </div>
             </div>
           ))}
         </div>

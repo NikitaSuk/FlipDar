@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useSession } from '@supabase/auth-helpers-react';
@@ -9,11 +9,12 @@ export default function LoginPage() {
   const supabase = useSupabaseClient();
   const router = useRouter();
   const session = useSession();
-  // Redirect if already logged in
-  if (session?.user) {
-    if (typeof window !== 'undefined') router.replace('/account');
-    return null;
-  }
+  useEffect(() => {
+    if (session?.user) {
+      router.replace('/account');
+    }
+  }, [session, router]);
+  if (session?.user) return null;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
