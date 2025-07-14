@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
+import { useAuth } from '../../../hooks/useAuth';
 
 const GearIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">⚙️</span>;
 const BellIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🔔</span>;
@@ -13,6 +14,7 @@ const GlobeIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle"
 
 export default function SettingsPage() {
   const { session, isLoading } = useProtectedRoute();
+  const { signOut } = useAuth();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     pushNotifications: false,
@@ -28,6 +30,10 @@ export default function SettingsPage() {
     setSettings(prev => ({ ...prev, [key]: value }));
     // Here you would typically save to database
     console.log(`Setting ${key} changed to ${value}`);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   if (isLoading) {
@@ -49,9 +55,11 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">
       <div className="w-full max-w-2xl mt-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Link href="/account" className="text-gray-600 hover:text-gray-800 mr-4">← Back to Account</Link>
+        <div className="relative mb-6">
+          <div className="absolute left-0 top-0">
+            <Link href="/account" className="text-gray-600 hover:text-gray-800">← Back to Account</Link>
+          </div>
+          <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-800">Settings & Options</h1>
           </div>
         </div>
@@ -199,11 +207,21 @@ export default function SettingsPage() {
               <button className="w-full py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
                 Change Password
               </button>
-              <button className="w-full py-3 px-4 border border-red-300 rounded-lg text-red-600 hover:bg-red-50 transition">
-                Delete Account
-              </button>
             </div>
           </div>
+        </div>
+
+        {/* Account Actions */}
+        <div className="mt-8 space-y-4">
+          <button 
+            onClick={handleSignOut}
+            className="w-full py-3 text-red-600 hover:text-red-700 transition-colors font-medium flex items-center justify-center"
+          >
+            🚪 Sign Out
+          </button>
+          <button className="w-full py-2 px-4 text-red-500 hover:text-red-700 text-sm transition-colors">
+            Delete Account
+          </button>
         </div>
       </div>
     </div>

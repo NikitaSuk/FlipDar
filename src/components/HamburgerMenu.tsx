@@ -48,6 +48,7 @@ export default function HamburgerMenu() {
     { section: 'Support', items: [
       { href: '/faq', label: 'FAQ', icon: '❓' },
       { href: '/contact', label: 'Contact', icon: '📧' },
+      { href: '/suggestions', label: 'Suggestions & Feedback', icon: '💡' },
     ]},
   ];
 
@@ -179,17 +180,6 @@ export default function HamburgerMenu() {
               </div>
             </div>
           ))}
-        </div>
-        {/* Sign Out */}
-        <div className="border-t border-gray-100 pt-3 mt-2">
-          <button
-            onClick={handleSignOut}
-            className="flex items-center w-full gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200 rounded-lg text-base font-medium focus:bg-red-100 focus:outline-none"
-            role="menuitem"
-          >
-            <span className="text-lg">🚪</span>
-            <span>Sign Out</span>
-          </button>
         </div>
       </div>
     </div>

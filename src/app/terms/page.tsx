@@ -1,11 +1,13 @@
 "use client";
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 const DocumentIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📄</span>;
 const CheckIcon = () => <span className="inline-block w-4 h-4 text-green-500">✓</span>;
 const XIcon = () => <span className="inline-block w-4 h-4 text-red-500">✗</span>;
 
 export default function TermsPage() {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -13,7 +15,7 @@ export default function TermsPage() {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <DocumentIcon />
-            <h1 className="text-3xl font-bold text-gray-800">Terms of Service</h1>
+            <h1 className="text-3xl font-bold text-gray-800 text-center">Terms of Service</h1>
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Please read these terms carefully before using FlipDar. By using our service, you agree to these terms.

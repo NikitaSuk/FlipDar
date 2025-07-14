@@ -14,6 +14,8 @@ export default function SubscriptionPage() {
   const [currentPlan, setCurrentPlan] = useState('free');
   const [billingCycle, setBillingCycle] = useState('monthly');
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   const plans = [
     {
       id: 'free',
@@ -90,9 +92,11 @@ export default function SubscriptionPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">
       <div className="w-full max-w-6xl mt-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
-            <Link href="/account" className="text-gray-600 hover:text-gray-800 mr-4">← Back to Account</Link>
+        <div className="relative mb-8">
+          <div className="absolute left-0 top-0">
+            <Link href="/account" className="text-gray-600 hover:text-gray-800">← Back to Account</Link>
+          </div>
+          <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-800">Subscription Plans</h1>
           </div>
         </div>

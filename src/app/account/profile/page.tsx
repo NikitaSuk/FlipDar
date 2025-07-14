@@ -45,6 +45,8 @@ export default function ProfilePage() {
     }
   }, [session]);
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
   };
@@ -126,7 +128,7 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
             <Link href="/account" className="text-gray-600 hover:text-gray-800 mr-4">← Back to Account</Link>
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center justify-center">
               <UserIcon />
               Edit Profile
             </h1>

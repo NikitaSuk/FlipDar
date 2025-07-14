@@ -10,6 +10,7 @@ const GearIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">
 const ChartIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📊</span>;
 const SubIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">💳</span>;
 const ClockIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🕒</span>;
+const SuggestionIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">💡</span>;
 
 const platforms = ["eBay", "Facebook Marketplace", "Craigslist", "OfferUp", "Mercari", "Other"];
 const conditions = ["New", "Like New", "Used", "For Parts", "Other"];
@@ -18,7 +19,6 @@ type MostProfitable = { item: string; total: number; sale: number; purchase: num
 
 export default function AccountPage() {
   const { session, isLoading } = useProtectedRoute();
-  const [searchHistory, setSearchHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [stats, setStats] = useState<{ totalSold: number; totalMade: number; mostProfitable: MostProfitable }>({ totalSold: 0, totalMade: 0, mostProfitable: null });
@@ -42,25 +42,7 @@ export default function AccountPage() {
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
 
-  // Fetch history
-  useEffect(() => {
-    if (!session) return;
-    setLoading(true);
-    setError('');
-    const fetchHistory = async () => {
-      try {
-        const res = await fetch(`/api/account/history?userId=${session.user.id}`);
-        if (!res.ok) throw new Error('Failed to fetch search history');
-        const data = await res.json();
-        setSearchHistory(data.history || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch search history');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
-  }, [session]);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   // Fetch transactions
   useEffect(() => {
@@ -240,6 +222,11 @@ export default function AccountPage() {
             <span className="flex-1">Settings & Options</span>
             <span className="text-gray-400">›</span>
           </Link>
+          <Link href="/suggestions" className="flex items-center px-6 py-4 hover:bg-gray-50 transition">
+            <SuggestionIcon />
+            <span className="flex-1">Suggestions & Feedback</span>
+            <span className="text-gray-400">›</span>
+          </Link>
         </div>
         {/* Stats Card */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6">
@@ -253,13 +240,7 @@ export default function AccountPage() {
             <div>Most Profitable Item: <b>{stats.mostProfitable ? `${stats.mostProfitable.item} (+$${stats.mostProfitable.total.toLocaleString(undefined, { maximumFractionDigits: 2 })} | Sold $${stats.mostProfitable.sale} - Bought $${stats.mostProfitable.purchase})` : 'N/A'}</b></div>
           </div>
         </div>
-        {/* Add Transaction Button */}
-        <button
-          className="w-full mb-4 py-3 rounded-xl bg-green-600 text-white font-semibold shadow hover:bg-green-700 transition"
-          onClick={() => setShowModal(true)}
-        >
-          + Add Transaction
-        </button>
+        
         {/* Transaction Modal */}
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -334,9 +315,10 @@ export default function AccountPage() {
           </div>
         )}
         {/* Transaction List */}
-        <div className="bg-white rounded-2xl shadow p-6 mb-6">
-          <div className="flex items-center mb-4">
+        <div className="bg-white rounded-2xl shadow p-6 mb-2">
+          <div className="flex items-center mb-4 justify-between">
             <span className="font-semibold text-gray-800 text-lg">Your Transactions</span>
+            <Link href="/account/transactions" className="text-sm text-green-600 hover:text-green-700 font-medium border border-green-200 rounded-lg px-3 py-1 ml-2">View All</Link>
           </div>
           {txLoading ? (
             <div className="text-gray-500">Loading...</div>
@@ -365,28 +347,13 @@ export default function AccountPage() {
             </ul>
           )}
         </div>
-        {/* Recent Searches Card (moved below transactions) */}
-        <div className="bg-white rounded-2xl shadow p-6 mb-6">
-          <div className="flex items-center mb-4">
-            <ClockIcon />
-            <span className="font-semibold text-gray-800 text-lg">Recent Searches</span>
-          </div>
-          {loading ? (
-            <div className="text-gray-500">Loading...</div>
-          ) : searchHistory.length === 0 ? (
-            <div className="text-gray-500">No searches yet.</div>
-          ) : (
-            <ul className="divide-y divide-gray-200">
-              {searchHistory.slice(0, 8).map((item) => (
-                <li key={item.id} className="py-3 flex flex-col md:flex-row md:items-center gap-2">
-                  <span className="font-medium text-gray-800 flex-1">{item.item}</span>
-                  <span className="text-gray-500 text-sm">Avg: ${item.avg_price?.toFixed(2) ?? 'N/A'}</span>
-                  <span className="text-gray-400 text-xs">{new Date(item.searched_at).toLocaleString()}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {/* Add Transaction Button */}
+        <button
+          className="w-full mb-4 py-3 rounded-xl bg-green-600 text-white font-semibold shadow hover:bg-green-700 transition"
+          onClick={() => setShowModal(true)}
+        >
+          + Add Transaction
+        </button>
         {error && <div className="text-red-500 mt-4 text-center">{error}</div>}
       </div>
     </div>

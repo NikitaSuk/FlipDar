@@ -38,15 +38,31 @@ export default function TransactionsPage() {
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
 
+  // 1. Add state for add transaction modal and form
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({
+    type: 'purchase',
+    item: '',
+    price: '',
+    date: '',
+    platform: '',
+    condition: '',
+    notes: ''
+  });
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
+
   useEffect(() => {
     if (!session?.user?.id) return;
     setLoading(true);
-    fetch(`/api/transactions?userId=${session.user.id}`)
+    fetch(`/api/transactions`)
       .then(res => res.json())
       .then(data => setTransactions(data.transactions || []))
       .catch(() => setTransactions([]))
       .finally(() => setLoading(false));
   }, [session]);
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   // Get unique platforms for filter dropdown
   const uniquePlatforms = ['all', ...Array.from(new Set(transactions.map(tx => tx.platform).filter(Boolean)))];
@@ -117,7 +133,7 @@ export default function TransactionsPage() {
     setEditLoading(true);
     setEditError('');
     try {
-      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
+      const res = await fetch(`/api/transactions?id=${editTx.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +163,7 @@ export default function TransactionsPage() {
     setEditLoading(true);
     setEditError('');
     try {
-      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
+      const res = await fetch(`/api/transactions?id=${editTx.id}`, {
         method: 'DELETE',
         headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
       });
@@ -175,6 +191,34 @@ export default function TransactionsPage() {
     setEditError('');
   };
 
+  // 2. Add handler for add transaction
+  const handleAddTransaction = async (e: any) => {
+    e.preventDefault();
+    if (!session) return;
+    setAddLoading(true);
+    setAddError('');
+    try {
+      const res = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...addForm,
+          price: parseFloat(addForm.price),
+          date: addForm.date || new Date().toISOString(),
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add transaction');
+      setTransactions([data.transaction, ...transactions]);
+      setShowAddModal(false);
+      setAddForm({ type: 'purchase', item: '', price: '', date: '', platform: '', condition: '', notes: '' });
+    } catch (err: any) {
+      setAddError(err.message || 'Failed to add transaction');
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50">
@@ -191,22 +235,26 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex flex-col items-center p-4">
-      <div className="w-full max-w-7xl mt-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 w-full flex flex-col p-0">
+      <div className="w-full max-w-7xl mx-auto mt-8 px-2 sm:px-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
-            <Link href="/account" className="text-gray-600 hover:text-gray-800 mr-4">← Back to Account</Link>
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center"><TransactionIcon />All Transactions</h1>
+        <div className="relative mb-8">
+          <div className="absolute left-0 top-0">
+            <Link href="/account" className="text-gray-600 hover:text-gray-800">← Back to Account</Link>
           </div>
-          <div className="text-sm text-gray-500">
-            {sortedTransactions.length} of {transactions.length} transactions
+          <div className="absolute right-0 top-0">
+            <div className="text-sm text-gray-500">
+              {sortedTransactions.length} of {transactions.length} transactions
+            </div>
+          </div>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center justify-center"><TransactionIcon />All Transactions</h1>
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar - Filters */}
-          <div className="w-64 flex-shrink-0">
+          <div className="w-full md:w-64 flex-shrink-0 mb-4 md:mb-0">
             <div className="bg-white rounded-2xl shadow p-6 sticky top-24">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-semibold text-gray-800 flex items-center">
@@ -320,11 +368,20 @@ export default function TransactionsPage() {
                 </div>
               </div>
             </div>
+            {/* Add Transaction Button (desktop, below filters) */}
+            <div className="hidden md:block mt-6 text-center">
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2 shadow w-full"
+                onClick={() => setShowAddModal(true)}
+              >
+                + Add Transaction
+              </button>
+            </div>
           </div>
 
           {/* Main Content - Table */}
-          <div className="flex-1">
-            <div className="bg-white rounded-2xl shadow p-6">
+          <div className="flex-1 min-w-0">
+            <div className="bg-white rounded-2xl shadow p-2 sm:p-4 md:p-6 overflow-x-auto">
               {loading ? (
                 <div className="text-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
@@ -347,41 +404,41 @@ export default function TransactionsPage() {
                   )}
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
+                <div className="overflow-x-auto w-full">
+                  <table className="min-w-full max-w-full divide-y divide-gray-200 text-sm">
                     <thead>
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('item')}>
+                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('item')}>
                           <div className="flex items-center">
                             Item
                             {sortField === 'item' && <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('type')}>
+                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('type')}>
                           <div className="flex items-center">
                             Type
                             {sortField === 'type' && <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('price')}>
+                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('price')}>
                           <div className="flex items-center">
                             Price
                             {sortField === 'price' && <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('platform')}>
+                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('platform')}>
                           <div className="flex items-center">
                             Platform
                             {sortField === 'platform' && <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('date')}>
+                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50" onClick={() => handleSort('date')}>
                           <div className="flex items-center">
                             Date
                             {sortField === 'date' && <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <th className="px-2 sm:px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
@@ -389,14 +446,14 @@ export default function TransactionsPage() {
                     <tbody className="divide-y divide-gray-100">
                       {sortedTransactions.map((tx) => (
                         <tr key={tx.id} className="hover:bg-gray-50 transition">
-                          <td className="px-4 py-3 font-medium text-gray-800">{tx.item}</td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3 font-medium text-gray-800 whitespace-nowrap max-w-[120px] overflow-hidden text-ellipsis">{tx.item}</td>
+                          <td className="px-2 sm:px-4 py-3">
                             <span className={`px-2 py-1 rounded text-xs font-bold ${tx.type === 'sale' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{tx.type.toUpperCase()}</span>
                           </td>
-                          <td className="px-4 py-3 text-gray-800 font-semibold">${parseFloat(tx.price).toFixed(2)}</td>
-                          <td className="px-4 py-3 text-gray-600">{tx.platform || '—'}</td>
-                          <td className="px-4 py-3 text-gray-600">{new Date(tx.date).toLocaleDateString()}</td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3 text-gray-800 font-semibold whitespace-nowrap">${parseFloat(tx.price).toFixed(2)}</td>
+                          <td className="px-2 sm:px-4 py-3 text-gray-600 whitespace-nowrap">{tx.platform || '—'}</td>
+                          <td className="px-2 sm:px-4 py-3 text-gray-600 whitespace-nowrap">{new Date(tx.date).toLocaleDateString()}</td>
+                          <td className="px-2 sm:px-4 py-3">
                             <button
                               onClick={() => openEditModal(tx)}
                               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -413,6 +470,14 @@ export default function TransactionsPage() {
             </div>
           </div>
         </div>
+        {/* Floating Add Button (mobile) */}
+        <button
+          className="fixed bottom-6 right-6 z-50 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg w-16 h-16 flex items-center justify-center text-3xl md:hidden"
+          onClick={() => setShowAddModal(true)}
+          aria-label="Add Transaction"
+        >
+          +
+        </button>
       </div>
 
       {/* Edit Transaction Modal */}
@@ -505,6 +570,42 @@ export default function TransactionsPage() {
                   Delete
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Transaction Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={() => setShowAddModal(false)}>&times;</button>
+            <h2 className="text-xl font-bold mb-4">Add Transaction</h2>
+            <form onSubmit={handleAddTransaction} className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <select className="flex-1 rounded border p-2" value={addForm.type} onChange={e => setAddForm(f => ({ ...f, type: e.target.value }))}>
+                  <option value="sale">Sale</option>
+                  <option value="purchase">Purchase</option>
+                </select>
+                <input className="flex-1 rounded border p-2" placeholder="Item" value={addForm.item} onChange={e => setAddForm(f => ({ ...f, item: e.target.value }))} required />
+              </div>
+              <div className="flex gap-2">
+                <input className="flex-1 rounded border p-2" type="number" min="0" step="0.01" placeholder="Price" value={addForm.price} onChange={e => setAddForm(f => ({ ...f, price: e.target.value }))} required />
+                <input className="flex-1 rounded border p-2" type="date" value={addForm.date} onChange={e => setAddForm(f => ({ ...f, date: e.target.value }))} />
+              </div>
+              <div className="flex gap-2">
+                <select className="flex-1 rounded border p-2" value={addForm.platform} onChange={e => setAddForm(f => ({ ...f, platform: e.target.value }))}>
+                  <option value="">Platform</option>
+                  {platforms.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <select className="flex-1 rounded border p-2" value={addForm.condition} onChange={e => setAddForm(f => ({ ...f, condition: e.target.value }))}>
+                  <option value="">Condition</option>
+                  {conditions.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <textarea className="rounded border p-2" placeholder="Notes (optional)" value={addForm.notes} onChange={e => setAddForm(f => ({ ...f, notes: e.target.value }))} />
+              {addError && <div className="text-red-500 text-sm text-center">{addError}</div>}
+              <button type="submit" className="btn-primary mt-2" disabled={addLoading}>{addLoading ? 'Saving...' : 'Add Transaction'}</button>
             </form>
           </div>
         </div>

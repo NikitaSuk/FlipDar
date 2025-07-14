@@ -21,6 +21,8 @@ export default function FAQPage() {
   const { session, isLoading } = useProtectedRoute();
   const [openItems, setOpenItems] = useState<number[]>([]);
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   const faqData: FAQItem[] = [
     {
       question: "What is FlipDar?",
@@ -102,7 +104,7 @@ export default function FAQPage() {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <QuestionIcon />
-            <h1 className="text-3xl font-bold text-gray-800">Frequently Asked Questions</h1>
+            <h1 className="text-3xl font-bold text-gray-800 text-center">Frequently Asked Questions</h1>
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Find answers to common questions about FlipDar, our features, and how to get the most out of your reselling business.

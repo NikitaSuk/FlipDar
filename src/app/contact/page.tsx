@@ -30,6 +30,8 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -119,7 +121,7 @@ export default function ContactPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Contact Us</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 text-center">Contact Us</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Have questions or need help? We're here to support your flipping journey. 
             Choose the best way to reach us below.
@@ -305,14 +307,22 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Address */}
+            {/* Related Topics */}
             <div className="bg-white rounded-2xl shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Our Office</h3>
-              <div className="text-gray-600 space-y-2">
-                <p>FlipDar Inc.</p>
-                <p>123 Flipper Street</p>
-                <p>Resale City, RC 12345</p>
-                <p>United States</p>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Related Topics</h3>
+              <div className="space-y-3">
+                <Link href="/suggestions" className="block text-green-600 hover:text-green-700 font-medium">
+                  💡 Suggestions & Feedback →
+                </Link>
+                <Link href="/faq" className="block text-green-600 hover:text-green-700 font-medium">
+                  ❓ Frequently Asked Questions →
+                </Link>
+                <Link href="/account/subscription" className="block text-green-600 hover:text-green-700 font-medium">
+                  💳 Billing & Subscriptions →
+                </Link>
+                <Link href="/account/settings" className="block text-green-600 hover:text-green-700 font-medium">
+                  ⚙️ Account Settings →
+                </Link>
               </div>
             </div>
           </div>

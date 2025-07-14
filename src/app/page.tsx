@@ -24,6 +24,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [searchError, setSearchError] = useState('');
+  const [searchSaveError, setSearchSaveError] = useState('');
   
   // Dynamic data state
   const [trendingItems, setTrendingItems] = useState(defaultTrendingItems);
@@ -107,6 +108,8 @@ export default function Home() {
     }
   }, [session]);
 
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -149,6 +152,7 @@ export default function Home() {
     setLoading(true);
     setResult(null);
     setSearchError('');
+    setSearchSaveError('');
     try {
       const res = await fetch('/api/ebay-search', {
         method: 'POST',
@@ -159,27 +163,30 @@ export default function Home() {
       if (res.ok) {
         setResult(data);
         // Save search to Supabase for trending analytics
-        if (session?.user?.id) {
-          try {
-            const { error: insertError } = await supabase.from('search_history').insert({
-              user_id: session.user.id,
-              item: item,
-              avg_price: data.avgPrice,
-              min_price: data.minPrice,
-              max_price: data.maxPrice,
-              avg_duration: data.avgDuration,
-              result_count: data.count,
-            });
-            
-            if (insertError) {
-              console.error('Error saving search history:', insertError);
-            } else {
-              console.log('Search history saved successfully');
-            }
-          } catch (saveError) {
-            console.error('Error saving search history:', saveError);
-          }
-        }
+        // if (session?.user?.id) {
+        //   try {
+        //     const { error: insertError } = await supabase.from('search_history').insert({
+        //       user_id: session.user.id,
+        //       item: item,
+        //       avg_price: data.avgPrice,
+        //       min_price: data.minPrice,
+        //       max_price: data.maxPrice,
+        //       avg_duration: data.avgDuration,
+        //       result_count: data.count,
+        //       searched_at: new Date().toISOString(),
+        //     });
+        //     if (insertError) {
+        //       setSearchSaveError('Failed to save search history.');
+        //       console.error('Error saving search history:', insertError);
+        //     } else {
+        //       // Notify account dashboard to refresh (if open in another tab)
+        //       window.dispatchEvent(new Event('flipdar-search-history-updated'));
+        //     }
+        //   } catch (saveError) {
+        //     setSearchSaveError('Failed to save search history.');
+        //     console.error('Error saving search history:', saveError);
+        //   }
+        // }
       } else {
         setSearchError(data.error || 'Error fetching data');
       }
@@ -382,6 +389,7 @@ export default function Home() {
             </button>
           </form>
           {searchError && <div className="text-red-500 mb-4">{searchError}</div>}
+          {searchSaveError && <div className="text-red-500 mb-2">{searchSaveError}</div>}
           {result && (
             <div className="glass-card p-4">
               <h2 className="text-lg font-bold mb-2 text-gray-800">Results for "{result.item}"</h2>
