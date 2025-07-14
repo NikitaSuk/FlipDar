@@ -239,7 +239,13 @@ export default function Home() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
+                className="w-full px-4 pb-0 pt-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
+              {authMode === 'sign-in' && (
+                <div className="pl-2 text-left -mt-4">
+                  <Link href="/forgot-password" className="text-xs text-green-700 hover:underline">Forgot password?</Link>
+                </div>
+              )}
               {authMode === 'sign-up' && (
                 <>
                   <input

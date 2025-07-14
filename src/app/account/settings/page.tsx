@@ -12,24 +12,38 @@ const ShieldIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle
 const PaletteIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🎨</span>;
 const GlobeIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🌐</span>;
 
+const defaultSettings = {
+  emailNotifications: true,
+  pushNotifications: false,
+  language: 'en',
+  currency: 'USD',
+  timezone: 'UTC',
+  autoSave: true,
+  dataSharing: false,
+};
+
 export default function SettingsPage() {
   const { session, isLoading } = useProtectedRoute();
   const { signOut } = useAuth();
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    pushNotifications: false,
-    darkMode: false,
-    language: 'en',
-    currency: 'USD',
-    timezone: 'UTC',
-    autoSave: true,
-    dataSharing: false
-  });
+  const [settings, setSettings] = useState(defaultSettings);
+  const [originalSettings, setOriginalSettings] = useState(defaultSettings);
+  const [applied, setApplied] = useState(false);
+  // Remove all backend integration and API calls
+  // Use only local state for settings, no useEffect for loading or saving
+  // Remove error state and loading state related to backend
+  // Remove handleApply async logic, just update local state
 
   const handleSettingChange = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
-    // Here you would typically save to database
-    console.log(`Setting ${key} changed to ${value}`);
+    setApplied(false);
+  };
+
+  const hasChanges = JSON.stringify(settings) !== JSON.stringify(originalSettings);
+
+  const handleApply = () => {
+    setOriginalSettings(settings);
+    setApplied(true);
+    setTimeout(() => setApplied(false), 2000);
   };
 
   const handleSignOut = async () => {
@@ -113,21 +127,6 @@ export default function SettingsPage() {
               <h2 className="text-xl font-semibold text-gray-800">Appearance</h2>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium text-gray-800">Dark Mode</div>
-                  <div className="text-sm text-gray-600">Switch to dark theme</div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.darkMode}
-                    onChange={(e) => handleSettingChange('darkMode', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                </label>
-              </div>
             </div>
           </div>
 
@@ -204,9 +203,11 @@ export default function SettingsPage() {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                 </label>
               </div>
-              <button className="w-full py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                Change Password
-              </button>
+              <Link href="/account/change-password">
+                <button className="w-full py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                  Change Password
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -215,9 +216,9 @@ export default function SettingsPage() {
         <div className="mt-8 space-y-4">
           <button 
             onClick={handleSignOut}
-            className="w-full py-3 text-red-600 hover:text-red-700 transition-colors font-medium flex items-center justify-center"
+            className="w-full text-red-600 hover:text-red-700 transition-colors font-medium flex items-center justify-center"
           >
-            🚪 Sign Out
+            Sign Out
           </button>
           <button className="w-full py-2 px-4 text-red-500 hover:text-red-700 text-sm transition-colors">
             Delete Account
