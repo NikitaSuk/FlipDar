@@ -1,3 +1,5 @@
+"use client";
+
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useState, useEffect } from 'react';
 

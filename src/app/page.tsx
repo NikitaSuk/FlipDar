@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useState, useEffect } from 'react';
 import Fuse from 'fuse.js';
+import { PasswordRequirements } from './signup/page';
 
 // Default trending items (fallback)
 const defaultTrendingItems = [
@@ -241,13 +242,9 @@ export default function Home() {
                 required
                 className="w-full px-4 pb-0 pt-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
-              {authMode === 'sign-in' && (
-                <div className="pl-2 text-left -mt-4">
-                  <Link href="/forgot-password" className="text-xs text-green-700 hover:underline">Forgot password?</Link>
-                </div>
-              )}
               {authMode === 'sign-up' && (
                 <>
+                  <PasswordRequirements password={password} />
                   <input
                     type="password"
                     placeholder="Confirm Password"
@@ -268,6 +265,11 @@ export default function Home() {
                     <Link href="/terms" className="underline hover:text-green-700">Terms of Service</Link>
                   </label>
                 </>
+              )}
+              {authMode === 'sign-in' && (
+                <div className="pl-2 text-left -mt-4">
+                  <Link href="/forgot-password" className="text-xs text-green-700 hover:underline">Forgot password?</Link>
+                </div>
               )}
               <button type="submit" className="btn-primary">
                 {authMode === 'sign-in' ? 'Sign In' : 'Sign Up'}

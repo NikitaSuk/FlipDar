@@ -1,9 +1,7 @@
 "use client";
-import { useSession } from '@supabase/auth-helpers-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useProtectedRoute } from '../../hooks/useProtectedRoute';
 
 const QuestionIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">❓</span>;
 const ArrowIcon = ({ isOpen }: { isOpen: boolean }) => (
@@ -18,7 +16,6 @@ interface FAQItem {
 }
 
 export default function FAQPage() {
-  const { session, isLoading } = useProtectedRoute();
   const [openItems, setOpenItems] = useState<number[]>([]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -81,21 +78,6 @@ export default function FAQPage() {
         : [...prev, index]
     );
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading FAQ...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return null; // This will be handled by useProtectedRoute
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-200 to-gray-50">

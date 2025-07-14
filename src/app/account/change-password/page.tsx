@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
+import { PasswordRequirements } from '../../signup/page';
 
 export default function ChangePasswordPage() {
   const { session, isLoading } = useProtectedRoute();
@@ -16,10 +17,21 @@ export default function ChangePasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Password validation checks
+  const hasNumber = /[0-9]/.test(newPassword);
+  const hasLetter = /[a-zA-Z]/.test(newPassword);
+  const hasSymbol = /[^a-zA-Z0-9]/.test(newPassword);
+  const isLongEnough = newPassword.length > 10;
+  const allValid = isLongEnough && hasNumber && hasLetter && hasSymbol;
+
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    if (!allValid) {
+      setError("Password must be more than 10 characters and include a number, a letter, and a symbol.");
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError("New passwords do not match.");
       return;
@@ -94,6 +106,7 @@ export default function ChangePasswordPage() {
               required
               autoComplete="new-password"
             />
+            <PasswordRequirements password={newPassword} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
