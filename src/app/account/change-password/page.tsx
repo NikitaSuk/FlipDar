@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { useProtectedRoute } from '../../../hooks/useProtectedRoute';
-import PasswordRequirements from '../../components/PasswordRequirements';
+import PasswordRequirements from '../../../components/PasswordRequirements';
 
 export default function ChangePasswordPage() {
   const { session, isLoading } = useProtectedRoute();
