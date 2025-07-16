@@ -43,7 +43,7 @@ export default function ChangePasswordPage() {
     setLoading(true);
     // Supabase requires re-authentication for password change. Sign in first.
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: session?.user?.email,
+      email: session?.user?.email || "",
       password: currentPassword,
     });
     if (signInError) {
