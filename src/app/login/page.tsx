@@ -1,12 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useSession } from '@supabase/auth-helpers-react';
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function ClientLoginForm() {
   const supabase = useSupabaseClient();
   const router = useRouter();
   const session = useSession();
@@ -72,4 +70,8 @@ export default function LoginPage() {
       </div>
     </div>
   );
+}
+
+export default function LoginPage() {
+  return <ClientLoginForm />;
 } 
