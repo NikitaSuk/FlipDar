@@ -37,19 +37,20 @@ export default function HamburgerMenu() {
   const menuItems = [
     { section: 'Navigation', items: [
       { href: '/', label: 'Home', icon: '🏠' },
+      { href: '/product/flipdar', label: 'FlipDar', icon: '🚀' },
       { href: '/account', label: 'Dashboard', icon: '📊' },
     ]},
     { section: 'Account', items: [
       { href: '/account/subscription', label: 'Subscription', icon: '💳' },
       { href: '/account/analytics', label: 'Analytics', icon: '📈' },
       { href: '/account/transactions', label: 'All Transactions', icon: '📝' },
-      { href: '/account/settings', label: 'Settings', icon: '⚙️' },
     ]},
     { section: 'Support', items: [
       { href: '/faq', label: 'FAQ', icon: '❓' },
       { href: '/contact', label: 'Contact', icon: '📧' },
       { href: '/suggestions', label: 'Suggestions & Feedback', icon: '💡' },
     ]},
+    // Admin section removed
   ];
 
   // Handle click outside to close menu
@@ -126,7 +127,7 @@ export default function HamburgerMenu() {
       >
         {/* User Info */}
         {user && (
-          <div className="px-4 py-4 border-b border-gray-100 mb-2">
+          <Link href="/account/center" onClick={() => setIsOpen(false)} className="block px-4 py-4 border-b border-gray-100 mb-2 hover:bg-gray-50 transition rounded-2xl">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 border-2 border-white shadow-sm">
                 {user.user_metadata?.avatar_url ? (
@@ -146,16 +147,9 @@ export default function HamburgerMenu() {
                   </div>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-gray-800 truncate">
-                  {user.user_metadata?.full_name || 'User'}
-                </div>
-                <div className="text-sm text-gray-500 truncate">
-                  {user.user_metadata?.username ? `@${user.user_metadata.username}` : user.email}
-                </div>
-              </div>
+              <span className="font-semibold text-gray-800 truncate">Account Center</span>
             </div>
-          </div>
+          </Link>
         )}
         {/* Menu Items */}
         <div className="py-2">

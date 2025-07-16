@@ -33,13 +33,13 @@ export default function PrivacyPage() {
             </p>
             <p className="text-gray-600 leading-relaxed">
               By using FlipDar, you agree to the collection and use of information in accordance with this policy. If you do not agree with our policies and practices, please do not use our service.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* Information We Collect */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Information We Collect</h2>
-            
+              
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Personal Information</h3>
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
                   <li>Name and contact information</li>
                   <li>Payment information (processed securely by our payment partners)</li>
                   <li>Profile information and preferences</li>
-                </ul>
+              </ul>
               </div>
 
               <div>
@@ -57,11 +57,11 @@ export default function PrivacyPage() {
                 <p className="text-gray-600 mb-3">We automatically collect certain information about your use of our service:</p>
                 <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
                   <li>Search queries and browsing history</li>
-                  <li>Transaction data you choose to log</li>
+                <li>Transaction data you choose to log</li>
                   <li>Device information and IP address</li>
                   <li>Usage patterns and feature interactions</li>
                   <li>Error logs and performance data</li>
-                </ul>
+              </ul>
               </div>
 
               <div>
@@ -71,10 +71,10 @@ export default function PrivacyPage() {
                   <li>eBay market data for price analysis</li>
                   <li>Analytics services for service improvement</li>
                   <li>Payment processors for subscription management</li>
-                </ul>
+              </ul>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* How We Use Information */}
           <section>
@@ -106,19 +106,19 @@ export default function PrivacyPage() {
                   <li>Analyze usage patterns to improve our service</li>
                   <li>Develop new features and functionality</li>
                   <li>Ensure security and prevent fraud</li>
-                  <li>Comply with legal obligations</li>
-                </ul>
+                <li>Comply with legal obligations</li>
+              </ul>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Information Sharing */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Information Sharing and Disclosure</h2>
             
             <p className="text-gray-600 mb-4">
-              We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except in the following circumstances:
-            </p>
+                We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except in the following circumstances:
+              </p>
 
             <div className="space-y-4">
               <div>
@@ -149,7 +149,7 @@ export default function PrivacyPage() {
                 </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Data Security */}
           <section>
@@ -197,10 +197,10 @@ export default function PrivacyPage() {
                 </div>
                 <p className="text-sm text-gray-600">
                   Our team receives regular training on data protection and privacy best practices.
-                </p>
+              </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Your Rights */}
           <section>
@@ -216,7 +216,7 @@ export default function PrivacyPage() {
                   <li>Request deletion of your account and data</li>
                   <li>Export your data in a portable format</li>
                   <li>Opt out of marketing communications</li>
-                </ul>
+              </ul>
               </div>
 
               <div>
@@ -230,41 +230,41 @@ export default function PrivacyPage() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Data Retention</h3>
                 <p className="text-gray-600">
                   We retain your information for as long as necessary to provide our services and comply with legal obligations. You can request deletion of your data at any time.
-                </p>
+              </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Children's Privacy */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Children's Privacy</h2>
             <p className="text-gray-600">
               Our service is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* International Transfers */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">International Data Transfers</h2>
             <p className="text-gray-600">
               Your information may be transferred to and processed in countries other than your own. We ensure that such transfers comply with applicable data protection laws and implement appropriate safeguards to protect your information.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* Changes to Policy */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Changes to This Privacy Policy</h2>
             <p className="text-gray-600">
               We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the "Last updated" date. Your continued use of our service after such changes constitutes acceptance of the updated policy.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* Contact Information */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Contact Us</h2>
             <p className="text-gray-600 mb-4">
               If you have any questions about this Privacy Policy or our data practices, please contact us:
-            </p>
+              </p>
             
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="space-y-2 text-gray-600">
@@ -272,8 +272,8 @@ export default function PrivacyPage() {
                 <p><strong>Address:</strong> FlipDar Inc., 123 Flipper Street, Resale City, RC 12345</p>
                 <p><strong>Phone:</strong> (555) 123-FLIP</p>
               </div>
-            </div>
-          </section>
+              </div>
+            </section>
         </div>
 
         {/* Footer Links */}

@@ -4,17 +4,14 @@ import { useRouter } from "next/navigation";
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useSession } from '@supabase/auth-helpers-react';
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function SignupPage() {
   const supabase = useSupabaseClient();
   const router = useRouter();
   const session = useSession();
-  useEffect(() => {
-    if (session?.user) {
-      router.replace('/account');
-    }
-  }, [session, router]);
-  if (session?.user) return null;
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -23,12 +20,21 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (session?.user) {
+      router.replace(redirect);
+      router.refresh();
+    }
+  }, [session, router, redirect]);
+
   // Password validation checks
   const hasNumber = /[0-9]/.test(password);
   const hasLetter = /[a-zA-Z]/.test(password);
   const hasSymbol = /[^a-zA-Z0-9]/.test(password);
   const isLongEnough = password.length > 10;
   const allValid = isLongEnough && hasNumber && hasLetter && hasSymbol;
+
+  if (session?.user) return null;
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +63,8 @@ export default function SignupPage() {
     if (error) {
       setError(error.message);
     } else {
-      router.push('/account');
+      router.replace(redirect);
+      router.refresh();
     }
   };
 

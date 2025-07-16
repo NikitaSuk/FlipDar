@@ -11,6 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 
 // New NavBar client component
 import NavBar from '../components/NavBar';
+import ConditionalFooter from '../components/ConditionalFooter';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SupabaseProvider>
           <NavBar />
           <div className="pt-20">{children}</div>
+          <ConditionalFooter />
         </SupabaseProvider>
       </body>
     </html>

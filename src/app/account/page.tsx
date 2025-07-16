@@ -41,15 +41,49 @@ export default function AccountPage() {
   const [editForm, setEditForm] = useState(form);
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
+  
+  // Suggestions state
+  const [suggestions, setSuggestions] = useState<{items: string[], platforms: string[], conditions: string[]}>({
+    items: [],
+    platforms: [],
+    conditions: []
+  });
+  const [showItemSuggestions, setShowItemSuggestions] = useState(false);
+  const [filteredItemSuggestions, setFilteredItemSuggestions] = useState<string[]>([]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Fetch transaction suggestions
+  useEffect(() => {
+    if (!session) return;
+    fetch('/api/transaction-suggestions')
+      .then(res => res.json())
+      .then(data => {
+        if (data.items) {
+          setSuggestions(data);
+        }
+      })
+      .catch(err => console.error('Error fetching suggestions:', err));
+  }, [session]);
+
+  // Filter item suggestions based on input
+  useEffect(() => {
+    if (form.item && suggestions.items.length > 0) {
+      const filtered = suggestions.items.filter(item => 
+        item.toLowerCase().includes(form.item.toLowerCase())
+      ).slice(0, 5);
+      setFilteredItemSuggestions(filtered);
+    } else {
+      setFilteredItemSuggestions([]);
+    }
+  }, [form.item, suggestions.items]);
 
   // Fetch transactions
   useEffect(() => {
     if (!session) return;
     setTxLoading(true);
     setTxError('');
-    fetch(`/api/transactions?userId=${session.user.id}`)
+    fetch('/api/transactions')
       .then(res => res.json())
       .then(data => {
         if (data.error) throw new Error(data.error);
@@ -59,51 +93,56 @@ export default function AccountPage() {
       .finally(() => setTxLoading(false));
   }, [session]);
 
-  // Calculate stats: Total Sold = sales count, Total Made = sales sum - purchase sum, Most Profitable Item = best (sale - purchase) pair
+  // Calculate stats: Only count realized profits (when items are sold)
   useEffect(() => {
     if (!transactions || transactions.length === 0) {
       setStats({ totalSold: 0, totalMade: 0, mostProfitable: null });
       return;
     }
     let totalSold = 0;
-    let totalSales = 0;
-    let totalPurchases = 0;
+    let totalRealizedProfit = 0;
     let bestProfit = -Infinity;
     let bestItem: MostProfitable = null;
+    
     // Group purchases and sales by item
     const purchasesByItem: Record<string, number[]> = {};
     const salesByItem: Record<string, number[]> = {};
+    
     transactions.forEach((tx: any) => {
       if (tx.type === 'sale' && tx.price) {
         totalSold += 1;
-        totalSales += Number(tx.price);
         salesByItem[tx.item] = salesByItem[tx.item] || [];
         salesByItem[tx.item].push(Number(tx.price));
       }
       if (tx.type === 'purchase' && tx.price) {
-        totalPurchases += Number(tx.price);
         purchasesByItem[tx.item] = purchasesByItem[tx.item] || [];
         purchasesByItem[tx.item].push(Number(tx.price));
       }
     });
-    // Find most profitable item (best single flip: max(sale - purchase) for any item)
+    
+    // Calculate realized profits (only when items are sold)
     Object.keys(salesByItem).forEach(item => {
       const sales = salesByItem[item];
       const purchases = purchasesByItem[item] || [];
-      // Try to match each sale to a purchase (greedy: lowest purchase to highest sale)
+      
+      // Match each sale to a purchase (FIFO method)
       const sortedSales = [...sales].sort((a, b) => b - a);
       const sortedPurchases = [...purchases].sort((a, b) => a - b);
+      
       for (let i = 0; i < Math.min(sortedSales.length, sortedPurchases.length); i++) {
         const profit = sortedSales[i] - sortedPurchases[i];
+        totalRealizedProfit += profit;
+        
         if (profit > bestProfit) {
           bestProfit = profit;
           bestItem = { item, total: profit, sale: sortedSales[i], purchase: sortedPurchases[i] };
         }
       }
     });
+    
     setStats({
       totalSold,
-      totalMade: totalSales - totalPurchases,
+      totalMade: totalRealizedProfit,
       mostProfitable: bestItem
     });
   }, [transactions]);
@@ -119,7 +158,6 @@ export default function AccountPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: session.user.id,
           ...form,
           price: parseFloat(form.price),
           date: form.date || new Date().toISOString(),
@@ -144,7 +182,7 @@ export default function AccountPage() {
     setEditLoading(true);
     setEditError('');
     try {
-      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
+      const res = await fetch(`/api/transactions?id=${editTx.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -171,7 +209,7 @@ export default function AccountPage() {
     setEditLoading(true);
     setEditError('');
     try {
-      const res = await fetch(`/api/transactions?id=${editTx.id}&userId=${session.user.id}`, {
+      const res = await fetch(`/api/transactions?id=${editTx.id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete transaction');
@@ -209,17 +247,13 @@ export default function AccountPage() {
           </div>
           <div className="font-bold text-lg text-gray-800 mb-1">{session.user.email}</div>
           <Link href="/account/profile" className="text-gray-400 text-sm hover:underline mb-2">Edit profile</Link>
+          <Link href="/account/center" className="text-green-600 hover:text-green-700 text-xs font-medium mt-2">Account Center</Link>
         </div>
         {/* Account Options List */}
         <div className="bg-white rounded-2xl shadow divide-y divide-gray-100 mb-6">
           <Link href="/account/subscription" className="flex items-center px-6 py-4 hover:bg-gray-50 transition">
             <SubIcon />
             <span className="flex-1">Change Subscription</span>
-            <span className="text-gray-400">›</span>
-          </Link>
-          <Link href="/account/settings" className="flex items-center px-6 py-4 hover:bg-gray-50 transition">
-            <GearIcon />
-            <span className="flex-1">Settings & Options</span>
             <span className="text-gray-400">›</span>
           </Link>
           <Link href="/suggestions" className="flex items-center px-6 py-4 hover:bg-gray-50 transition">
@@ -253,7 +287,33 @@ export default function AccountPage() {
                     <option value="sale">Sale</option>
                     <option value="purchase">Purchase</option>
                   </select>
-                  <input className="flex-1 rounded border p-2" placeholder="Item" value={form.item} onChange={e => setForm(f => ({ ...f, item: e.target.value }))} required />
+                  <div className="flex-1 relative">
+                    <input 
+                      className="w-full rounded border p-2" 
+                      placeholder="Item" 
+                      value={form.item} 
+                      onChange={e => setForm(f => ({ ...f, item: e.target.value }))}
+                      onFocus={() => setShowItemSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowItemSuggestions(false), 150)}
+                      required 
+                    />
+                    {showItemSuggestions && filteredItemSuggestions.length > 0 && (
+                      <ul className="absolute left-0 right-0 top-full bg-white border rounded shadow z-10 max-h-32 overflow-y-auto">
+                        {filteredItemSuggestions.map(suggestion => (
+                          <li
+                            key={suggestion}
+                            className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                            onMouseDown={() => {
+                              setForm(f => ({ ...f, item: suggestion }));
+                              setShowItemSuggestions(false);
+                            }}
+                          >
+                            {suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <input className="flex-1 rounded border p-2" type="number" min="0" step="0.01" placeholder="Price" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} required />
@@ -263,10 +323,12 @@ export default function AccountPage() {
                   <select className="flex-1 rounded border p-2" value={form.platform} onChange={e => setForm(f => ({ ...f, platform: e.target.value }))}>
                     <option value="">Platform</option>
                     {platforms.map(p => <option key={p} value={p}>{p}</option>)}
+                    {suggestions.platforms.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                   <select className="flex-1 rounded border p-2" value={form.condition} onChange={e => setForm(f => ({ ...f, condition: e.target.value }))}>
                     <option value="">Condition</option>
                     {conditions.map(c => <option key={c} value={c}>{c}</option>)}
+                    {suggestions.conditions.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <textarea className="rounded border p-2" placeholder="Notes (optional)" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
@@ -288,7 +350,15 @@ export default function AccountPage() {
                     <option value="purchase">Purchase</option>
                     <option value="sale">Sale</option>
                   </select>
-                  <input className="flex-1 rounded border p-2" placeholder="Item" value={editForm.item} onChange={e => setEditForm(f => ({ ...f, item: e.target.value }))} required />
+                  <div className="flex-1 relative">
+                    <input 
+                      className="w-full rounded border p-2" 
+                      placeholder="Item" 
+                      value={editForm.item} 
+                      onChange={e => setEditForm(f => ({ ...f, item: e.target.value }))}
+                      required 
+                    />
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <input className="flex-1 rounded border p-2" type="number" min="0" step="0.01" placeholder="Price" value={editForm.price} onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))} required />
@@ -298,10 +368,12 @@ export default function AccountPage() {
                   <select className="flex-1 rounded border p-2" value={editForm.platform} onChange={e => setEditForm(f => ({ ...f, platform: e.target.value }))}>
                     <option value="">Platform</option>
                     {platforms.map(p => <option key={p} value={p}>{p}</option>)}
+                    {suggestions.platforms.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                   <select className="flex-1 rounded border p-2" value={editForm.condition} onChange={e => setEditForm(f => ({ ...f, condition: e.target.value }))}>
                     <option value="">Condition</option>
                     {conditions.map(c => <option key={c} value={c}>{c}</option>)}
+                    {suggestions.conditions.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <textarea className="rounded border p-2" placeholder="Notes (optional)" value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} />

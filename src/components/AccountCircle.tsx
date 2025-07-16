@@ -14,7 +14,7 @@ export default function AccountCircle() {
   const fullName = session.user.user_metadata?.full_name || '';
   const email = session.user.email || '';
   const initials = fullName 
-    ? fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    ? fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : email[0]?.toUpperCase() || 'U';
 
   return (

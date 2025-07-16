@@ -63,7 +63,7 @@ export default function ChangePasswordPage() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setTimeout(() => router.push("/account/settings"), 2000);
+      // setTimeout(() => router.push("/account/settings"), 2000);
     }
   };
 
@@ -130,7 +130,7 @@ export default function ChangePasswordPage() {
           </button>
         </form>
         <div className="mt-6 text-center">
-          <Link href="/account/settings" className="text-gray-500 hover:underline">Back to Settings</Link>
+          {/* <Link href="/account/settings" className="text-gray-500 hover:underline">Back to Settings</Link> */}
         </div>
       </div>
     </div>

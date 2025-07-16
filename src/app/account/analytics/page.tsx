@@ -28,7 +28,7 @@ export default function AnalyticsPage() {
       setLoading(true);
       try {
         // Fetch transactions
-        const txResponse = await fetch(`/api/transactions?userId=${session.user.id}`);
+        const txResponse = await fetch('/api/transactions');
         const txData = await txResponse.json();
         setTransactions(txData.transactions || []);
 
@@ -48,7 +48,19 @@ export default function AnalyticsPage() {
 
   // Calculate analytics
   const calculateAnalytics = () => {
-    if (!transactions.length) return null;
+    if (!transactions.length) {
+      return {
+        totalSales: 0,
+        totalPurchases: 0,
+        totalProfit: 0,
+        profitMargin: 0,
+        avgSalePrice: 0,
+        avgPurchasePrice: 0,
+        salesCount: 0,
+        purchasesCount: 0,
+        topItems: []
+      };
+    }
 
     const sales = transactions.filter(tx => tx.type === 'sale');
     const purchases = transactions.filter(tx => tx.type === 'purchase');
@@ -61,14 +73,27 @@ export default function AnalyticsPage() {
     const avgSalePrice = sales.length > 0 ? totalSales / sales.length : 0;
     const avgPurchasePrice = purchases.length > 0 ? totalPurchases / purchases.length : 0;
 
-    // Most profitable items
+    // Most profitable items (using FIFO matching for realized profits)
     const itemProfits: { [key: string]: number } = {};
+    const purchaseQueues: Record<string, number[]> = {};
+    
+    // First, organize purchases by item
     purchases.forEach(purchase => {
       const item = purchase.item;
-      const matchingSales = sales.filter(sale => sale.item === item);
-      const purchasePrice = parseFloat(purchase.price);
-      const totalSalePrice = matchingSales.reduce((sum, sale) => sum + parseFloat(sale.price), 0);
-      itemProfits[item] = (itemProfits[item] || 0) + (totalSalePrice - purchasePrice);
+      if (!purchaseQueues[item]) purchaseQueues[item] = [];
+      purchaseQueues[item].push(parseFloat(purchase.price));
+    });
+    
+    // Then, match sales to purchases using FIFO
+    sales.forEach(sale => {
+      const item = sale.item;
+      const salePrice = parseFloat(sale.price);
+      
+      if (purchaseQueues[item] && purchaseQueues[item].length > 0) {
+        const purchasePrice = purchaseQueues[item].shift()!;
+        const profit = salePrice - purchasePrice;
+        itemProfits[item] = (itemProfits[item] || 0) + profit;
+      }
     });
 
     const topItems = Object.entries(itemProfits)
@@ -176,17 +201,21 @@ export default function AnalyticsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading analytics data...</p>
           </div>
-        ) : !analytics ? (
-          <div className="text-center py-12">
-            <ChartIcon />
-            <h2 className="text-xl font-semibold text-gray-800 mt-4 mb-2">No Data Yet</h2>
-            <p className="text-gray-600 mb-4">Start adding transactions to see your analytics</p>
-            <Link href="/account" className="btn-primary">
-              Add Your First Transaction
-            </Link>
-          </div>
         ) : (
           <>
+            {/* No Data Message */}
+            {!analytics || (analytics.totalSales === 0 && analytics.totalPurchases === 0) ? (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center">
+                  <div className="text-blue-500 mr-3">💡</div>
+                  <div>
+                    <p className="text-blue-800 font-medium">No transactions yet</p>
+                    <p className="text-blue-700 text-sm">Start adding transactions to see your analytics data</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <div className="bg-white rounded-2xl shadow p-6">

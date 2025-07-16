@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
             image_url: itemImages[item] || '',
             result_count: 0
           };
-        }
+    }
       })
     );
     return NextResponse.json({ items: results });

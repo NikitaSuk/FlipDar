@@ -27,44 +27,44 @@ export default function TermsPage() {
         <div className="bg-white rounded-2xl shadow p-8 space-y-8">
           {/* Introduction */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">1. Acceptance of Terms</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">1. Acceptance of Terms</h2>
             <p className="text-gray-600 leading-relaxed mb-4">
               By accessing and using FlipDar ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
             </p>
             <p className="text-gray-600 leading-relaxed">
               These Terms of Service ("Terms") govern your use of the FlipDar platform, including all features, content, and services available through our website and applications.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* Service Description */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">2. Service Description</h2>
             <p className="text-gray-600 mb-4">
               FlipDar is a reselling analytics platform that provides:
-            </p>
+              </p>
             <ul className="list-disc list-inside text-gray-600 space-y-2 ml-4">
               <li>Market price analysis and research tools</li>
               <li>Transaction tracking and profit calculation</li>
               <li>Search history and analytics</li>
               <li>User account management and data storage</li>
               <li>Integration with third-party marketplaces</li>
-            </ul>
-          </section>
+              </ul>
+            </section>
 
           {/* User Accounts */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">3. User Accounts</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">3. User Accounts</h2>
             
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Account Creation</h3>
                 <p className="text-gray-600 mb-3">To use certain features of our service, you must create an account. You agree to:</p>
                 <ul className="list-disc list-inside text-gray-600 space-y-1 ml-4">
-                  <li>Provide accurate, current, and complete information</li>
-                  <li>Maintain and update your account information</li>
-                  <li>Keep your password secure and confidential</li>
-                  <li>Accept responsibility for all activities under your account</li>
-                </ul>
+                <li>Provide accurate, current, and complete information</li>
+                <li>Maintain and update your account information</li>
+                <li>Keep your password secure and confidential</li>
+                <li>Accept responsibility for all activities under your account</li>
+              </ul>
               </div>
 
               <div>
@@ -81,7 +81,7 @@ export default function TermsPage() {
                 </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Acceptable Use */}
           <section>
@@ -140,18 +140,18 @@ export default function TermsPage() {
                 </div>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Subscription and Payment */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">5. Subscription and Payment</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">5. Subscription and Payment</h2>
             
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Subscription Plans</h3>
                 <p className="text-gray-600 mb-3">
                   We offer various subscription plans with different features and usage limits. All subscriptions are billed in advance on a recurring basis.
-                </p>
+              </p>
               </div>
 
               <div>
@@ -161,7 +161,7 @@ export default function TermsPage() {
                   <li>Prices may change with 30 days notice</li>
                   <li>Failed payments may result in service suspension</li>
                   <li>You authorize us to charge your payment method</li>
-                </ul>
+              </ul>
               </div>
 
               <div>
@@ -171,7 +171,7 @@ export default function TermsPage() {
                 </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Data and Privacy */}
           <section>
@@ -196,10 +196,10 @@ export default function TermsPage() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Data Security</h3>
                 <p className="text-gray-600">
                   We implement appropriate security measures to protect your data, but no system is completely secure. You are responsible for maintaining the security of your account.
-                </p>
+              </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Intellectual Property */}
           <section>
@@ -224,10 +224,10 @@ export default function TermsPage() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Third-Party Content</h3>
                 <p className="text-gray-600">
                   Our service may contain content from third parties, including market data from eBay and other sources. We are not responsible for the accuracy or completeness of such content.
-                </p>
+              </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Disclaimers and Limitations */}
           <section>
@@ -245,48 +245,48 @@ export default function TermsPage() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Data Accuracy</h3>
                 <p className="text-gray-600">
                   While we strive for accuracy, market data and analytics are estimates based on available information. We do not guarantee the accuracy, completeness, or timeliness of any data.
-                </p>
+              </p>
               </div>
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Limitation of Liability</h3>
                 <p className="text-gray-600">
                   In no event shall FlipDar be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
-                </p>
+              </p>
               </div>
             </div>
-          </section>
+            </section>
 
           {/* Indemnification */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">9. Indemnification</h2>
             <p className="text-gray-600">
               You agree to defend, indemnify, and hold harmless FlipDar and its officers, directors, employees, and agents from and against any claims, damages, obligations, losses, liabilities, costs, or debt arising from your use of the service or violation of these terms.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* Governing Law */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">10. Governing Law</h2>
             <p className="text-gray-600">
               These terms shall be governed by and construed in accordance with the laws of the jurisdiction in which FlipDar operates, without regard to its conflict of law provisions.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* Changes to Terms */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">11. Changes to Terms</h2>
             <p className="text-gray-600">
               We reserve the right to modify these terms at any time. We will notify users of material changes via email or through our service. Your continued use of the service after such changes constitutes acceptance of the new terms.
-            </p>
-          </section>
+              </p>
+            </section>
 
           {/* Contact Information */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">12. Contact Information</h2>
             <p className="text-gray-600 mb-4">
               If you have any questions about these Terms of Service, please contact us:
-            </p>
+              </p>
             
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="space-y-2 text-gray-600">
@@ -294,8 +294,8 @@ export default function TermsPage() {
                 <p><strong>Address:</strong> FlipDar Inc., 123 Flipper Street, Resale City, RC 12345</p>
                 <p><strong>Phone:</strong> (555) 123-FLIP</p>
               </div>
-            </div>
-          </section>
+              </div>
+            </section>
         </div>
 
         {/* Footer Links */}

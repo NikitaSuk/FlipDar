@@ -137,7 +137,6 @@ export default function TransactionsPage() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
         },
         body: JSON.stringify({
           ...editForm,
@@ -165,7 +164,6 @@ export default function TransactionsPage() {
     try {
       const res = await fetch(`/api/transactions?id=${editTx.id}`, {
         method: 'DELETE',
-        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
       });
       if (!res.ok) throw new Error('Failed to delete transaction');
       setTransactions(transactions.filter(tx => tx.id !== editTx.id));

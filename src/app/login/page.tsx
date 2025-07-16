@@ -4,17 +4,20 @@ import { useRouter } from "next/navigation";
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useSession } from '@supabase/auth-helpers-react';
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const supabase = useSupabaseClient();
   const router = useRouter();
   const session = useSession();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
   useEffect(() => {
     if (session?.user) {
-      router.replace('/account');
+      router.replace(redirect);
+      router.refresh();
     }
-  }, [session, router]);
-  if (session?.user) return null;
+  }, [session, router, redirect]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,7 +32,8 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
-      router.push('/account');
+      router.replace(redirect);
+      router.refresh();
     }
   };
 

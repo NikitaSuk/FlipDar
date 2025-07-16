@@ -4,8 +4,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const EmailIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📧</span>;
-const PhoneIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">📞</span>;
-const ChatIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">💬</span>;
 const ClockIcon = () => <span className="inline-block w-5 h-5 mr-2 align-middle">🕒</span>;
 
 interface ContactForm {
@@ -67,25 +65,9 @@ export default function ContactPage() {
       icon: <EmailIcon />,
       title: 'Email Support',
       description: 'Get help via email',
-      contact: 'support@flipdar.com',
+      contact: 'flipdarllc@gmail.com',
       response: 'Within 24 hours',
-      action: 'mailto:support@flipdar.com'
-    },
-    {
-      icon: <ChatIcon />,
-      title: 'Live Chat',
-      description: 'Chat with our team',
-      contact: 'Available 9AM-6PM EST',
-      response: 'Instant response',
-      action: '#chat'
-    },
-    {
-      icon: <PhoneIcon />,
-      title: 'Phone Support',
-      description: 'Call us directly',
-      contact: '(555) 123-FLIP',
-      response: 'Mon-Fri 9AM-6PM EST',
-      action: 'tel:+15551234567'
+      action: 'mailto:flipdarllc@gmail.com'
     }
   ];
 
@@ -111,17 +93,14 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Methods */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="mb-12 flex flex-col sm:flex-row gap-6 justify-center items-stretch">
+          {/* Email Support Bubble */}
           {contactMethods.map((method, index) => (
-            <div key={index} className="bg-white rounded-xl shadow p-6 text-center">
+            <div key={index} className="bg-white rounded-xl shadow p-6 text-center flex-1 min-w-[260px] max-w-xs flex flex-col justify-between">
               <div className="text-3xl mb-4">{method.icon}</div>
               <h3 className="font-semibold text-gray-800 mb-2">{method.title}</h3>
               <p className="text-sm text-gray-600 mb-3">{method.description}</p>
               <div className="text-sm text-gray-800 font-medium mb-2">{method.contact}</div>
-              <div className="text-xs text-gray-500 mb-4 flex items-center justify-center">
-                <ClockIcon />
-                {method.response}
-              </div>
               <a
                 href={method.action}
                 className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
@@ -130,6 +109,14 @@ export default function ContactPage() {
               </a>
             </div>
           ))}
+          {/* Business Hours Bubble */}
+          <div className="bg-white rounded-xl shadow p-6 text-center flex-1 min-w-[260px] max-w-xs flex flex-col justify-center items-center">
+            <div className="text-3xl mb-4"><ClockIcon /></div>
+            <h3 className="font-semibold text-gray-800 mb-2">Business Hours</h3>
+            <p className="text-gray-700 text-sm mb-1">Mon – Fri</p>
+            <p className="text-gray-700 text-sm mb-2">9:00 AM – 6:00 PM</p>
+            <p className="text-gray-500 text-xs">We respond to inquiries during these hours.</p>
+          </div>
         </div>
 
         {/* Contact Form */}
@@ -248,22 +235,14 @@ export default function ContactPage() {
 
           {/* Info */}
           <div className="space-y-8">
-            {/* Office Hours */}
-            <div className="bg-white rounded-2xl shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Office Hours</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Monday - Friday</span>
-                  <span className="font-medium">9:00 AM - 6:00 PM EST</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Saturday</span>
-                  <span className="font-medium">10:00 AM - 4:00 PM EST</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Sunday</span>
-                  <span className="font-medium">Closed</span>
-                </div>
+
+            {/* Email Mention */}
+            <div className="bg-white rounded-2xl shadow p-6 flex items-center">
+              <EmailIcon />
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Contact Email</h3>
+                <a href="mailto:flipdarllc@gmail.com" className="text-green-600 hover:text-green-700 font-medium text-sm">flipdarllc@gmail.com</a>
+                <p className="text-gray-500 text-xs">Feel free to email us directly for any inquiries.</p>
               </div>
             </div>
 
@@ -276,9 +255,6 @@ export default function ContactPage() {
                 </Link>
                 <Link href="/account/subscription" className="block text-green-600 hover:text-green-700 font-medium">
                   Subscription Plans →
-                </Link>
-                <Link href="/account/settings" className="block text-green-600 hover:text-green-700 font-medium">
-                  Account Settings →
                 </Link>
                 <Link href="/privacy" className="block text-green-600 hover:text-green-700 font-medium">
                   Privacy Policy →
@@ -301,9 +277,6 @@ export default function ContactPage() {
                 </Link>
                 <Link href="/account/subscription" className="block text-green-600 hover:text-green-700 font-medium">
                   💳 Billing & Subscriptions →
-                </Link>
-                <Link href="/account/settings" className="block text-green-600 hover:text-green-700 font-medium">
-                  ⚙️ Account Settings →
                 </Link>
               </div>
             </div>

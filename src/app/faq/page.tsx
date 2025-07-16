@@ -90,7 +90,7 @@ export default function FAQPage() {
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Find answers to common questions about FlipDar, our features, and how to get the most out of your reselling business.
-          </p>
+            </p>
         </div>
 
         {/* FAQ Items */}
@@ -128,16 +128,16 @@ export default function FAQPage() {
           <p className="text-gray-600 mb-6">
             Can't find what you're looking for? Our support team is here to help.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/contact" 
-              className="btn-primary"
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              href="/contact"
+              className="btn-primary w-full sm:w-auto"
             >
               Contact Support
             </Link>
             <Link 
               href="/account" 
-              className="btn-secondary"
+              className="btn-secondary w-full sm:w-auto"
             >
               Go to Dashboard
             </Link>
@@ -145,32 +145,26 @@ export default function FAQPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl mb-3">📊</div>
-            <h3 className="font-semibold text-gray-800 mb-2">Analytics</h3>
-            <p className="text-sm text-gray-600 mb-4">Track your profits and performance</p>
-            <Link href="/account/analytics" className="text-green-600 hover:text-green-700 font-medium">
-              View Analytics →
-            </Link>
+        <div className="mt-12 flex flex-col sm:flex-row gap-6 justify-center items-stretch max-w-2xl mx-auto">
+          <div className="flex-1 basis-1/2 min-w-[260px] max-w-xs flex flex-col">
+            <div className="bg-white rounded-xl shadow p-6 text-center flex-1 flex flex-col justify-between">
+              <div className="text-3xl mb-3">📊</div>
+              <h3 className="font-semibold text-gray-800 mb-2">Analytics</h3>
+              <p className="text-sm text-gray-600 mb-4">Track your profits and performance</p>
+              <Link href="/account/analytics" className="text-green-600 hover:text-green-700 font-medium">
+                View Analytics →
+              </Link>
+            </div>
           </div>
-          
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl mb-3">💳</div>
-            <h3 className="font-semibold text-gray-800 mb-2">Pricing</h3>
-            <p className="text-sm text-gray-600 mb-4">Compare plans and features</p>
-            <Link href="/account/subscription" className="text-green-600 hover:text-green-700 font-medium">
-              View Plans →
-            </Link>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow p-6 text-center">
-            <div className="text-3xl mb-3">⚙️</div>
-            <h3 className="font-semibold text-gray-800 mb-2">Settings</h3>
-            <p className="text-sm text-gray-600 mb-4">Customize your experience</p>
-            <Link href="/account/settings" className="text-green-600 hover:text-green-700 font-medium">
-              Manage Settings →
-            </Link>
+          <div className="flex-1 basis-1/2 min-w-[260px] max-w-xs flex flex-col">
+            <div className="bg-white rounded-xl shadow p-6 text-center flex-1 flex flex-col justify-between">
+              <div className="text-3xl mb-3">💳</div>
+              <h3 className="font-semibold text-gray-800 mb-2">Pricing</h3>
+              <p className="text-sm text-gray-600 mb-4">Compare plans and features</p>
+              <Link href="/account/subscription" className="text-green-600 hover:text-green-700 font-medium">
+                View Plans →
+              </Link>
+            </div>
           </div>
         </div>
       </div>
