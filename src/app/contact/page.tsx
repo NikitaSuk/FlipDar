@@ -38,12 +38,13 @@ export default function ContactPage() {
     setSubmitStatus('idle');
 
     try {
-      // Simulate form submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Here you would typically send the form data to your backend
-      console.log('Form submitted:', formData);
-      
+      // Send form data to backend API to send email
+      const res = await fetch('/api/send-contact-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error('Failed to send email');
       setSubmitStatus('success');
       setFormData({
         name: '',
@@ -127,7 +128,7 @@ export default function ContactPage() {
             
             {submitStatus === 'success' && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800">Thank you! Your message has been sent successfully. We'll get back to you soon.</p>
+                <p className="text-green-800">Thank you! Your message has been sent directly to flipdarllc@gmail.com. We'll get back to you soon.</p>
               </div>
             )}
 

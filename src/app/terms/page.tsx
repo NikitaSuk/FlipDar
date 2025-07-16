@@ -20,7 +20,7 @@ export default function TermsPage() {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Please read these terms carefully before using FlipDar. By using our service, you agree to these terms.
           </p>
-          <p className="text-sm text-gray-500 mt-2">Last updated: December 2024</p>
+          <p className="text-sm text-gray-500 mt-2">Last updated: July 2025</p>
         </div>
 
         {/* Content */}
@@ -232,7 +232,6 @@ export default function TermsPage() {
           {/* Disclaimers and Limitations */}
           <section>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">8. Disclaimers and Limitations</h2>
-            
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Service Availability</h3>
@@ -240,22 +239,23 @@ export default function TermsPage() {
                   We strive to maintain high availability but do not guarantee uninterrupted access. The service is provided "as is" without warranties of any kind.
                 </p>
               </div>
-
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Data Accuracy</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Data Accuracy & No Guarantees</h3>
                 <p className="text-gray-600">
-                  While we strive for accuracy, market data and analytics are estimates based on available information. We do not guarantee the accuracy, completeness, or timeliness of any data.
-              </p>
+                  All information, analytics, and data provided by FlipDar are for informational purposes only and are provided "as is" without any guarantees, representations, or warranties of any kind, express or implied. While we strive for accuracy, market data and analytics are estimates based on available information and may not be accurate, complete, or up-to-date. FlipDar does not guarantee the accuracy, completeness, reliability, or timeliness of any data, analytics, or information provided. Users assume all risk associated with the use of the service, and FlipDar is not responsible for any business, financial, or other outcomes resulting from use of the platform.
+                </p>
+                <p className="text-gray-600 mt-2">
+                  Users should not provide sensitive personal information (such as phone number or address) to FlipDar. We do not require or request such information for use of the service, and you should not submit it anywhere on the platform.
+                </p>
               </div>
-
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Limitation of Liability</h3>
                 <p className="text-gray-600">
                   In no event shall FlipDar be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
-              </p>
+                </p>
               </div>
             </div>
-            </section>
+          </section>
 
           {/* Indemnification */}
           <section>
@@ -286,16 +286,14 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">12. Contact Information</h2>
             <p className="text-gray-600 mb-4">
               If you have any questions about these Terms of Service, please contact us:
-              </p>
-            
+            </p>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="space-y-2 text-gray-600">
-                <p><strong>Email:</strong> legal@flipdar.com</p>
-                <p><strong>Address:</strong> FlipDar Inc., 123 Flipper Street, Resale City, RC 12345</p>
-                <p><strong>Phone:</strong> (555) 123-FLIP</p>
+                <p><strong>Email:</strong> flipdarllc@gmail.com</p>
+                <p className="text-xs text-gray-500">We do not require or request your phone number or address for use of FlipDar. Please do not submit sensitive personal information.</p>
               </div>
-              </div>
-            </section>
+            </div>
+          </section>
         </div>
 
         {/* Footer Links */}
