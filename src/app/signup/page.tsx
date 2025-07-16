@@ -1,13 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useSession } from '@supabase/auth-helpers-react';
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import PasswordRequirements from '../../components/PasswordRequirements';
 
-export default function SignupPage() {
+function ClientSignupForm() {
   const supabase = useSupabaseClient();
   const router = useRouter();
   const session = useSession();
@@ -128,4 +126,8 @@ export default function SignupPage() {
       </div>
     </div>
   );
+}
+
+export default function SignupPage() {
+  return <ClientSignupForm />;
 } 
