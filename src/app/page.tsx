@@ -53,12 +53,40 @@ export default function LandingPage() {
         <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto mb-10 font-medium text-center">
           FlipDar makes it easy to research, track, and optimize your reselling business in just a few steps.
         </p>
-        <ol className="space-y-10 text-xl text-gray-700 list-decimal list-inside">
-          <li className="flex items-center gap-4"><span className="text-green-600 text-3xl">1</span> <b>Sign up</b> for a free account and connect your favorite platforms.</li>
-          <li className="flex items-center gap-4"><span className="text-green-600 text-3xl">2</span> <b>Search</b> for items to see real-time market data and trends.</li>
-          <li className="flex items-center gap-4"><span className="text-green-600 text-3xl">3</span> <b>Track</b> your purchases and sales to monitor your profits.</li>
-          <li className="flex items-center gap-4"><span className="text-green-600 text-3xl">4</span> <b>Analyze</b> your performance with beautiful dashboards and insights.</li>
-        </ol>
+        <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch">
+          {/* Step 1 */}
+          <div className="flex-1 glass-card bg-white/80 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center animate-fade-in delay-100 hover:scale-105 transition-transform duration-300">
+            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-green-200 via-blue-200 to-purple-200 mb-4 shadow-lg">
+              <span className="text-4xl">📝</span>
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-800">Sign Up</h3>
+            <p className="text-gray-600 text-base mb-1">Create a free account and connect your favorite platforms.</p>
+          </div>
+          {/* Step 2 */}
+          <div className="flex-1 glass-card bg-white/80 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center animate-fade-in delay-200 hover:scale-105 transition-transform duration-300">
+            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-green-200 via-blue-200 to-purple-200 mb-4 shadow-lg">
+              <span className="text-4xl">🔍</span>
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-800">Search</h3>
+            <p className="text-gray-600 text-base mb-1">Find items to see real-time market data and trends.</p>
+          </div>
+          {/* Step 3 */}
+          <div className="flex-1 glass-card bg-white/80 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center animate-fade-in delay-300 hover:scale-105 transition-transform duration-300">
+            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-green-200 via-blue-200 to-purple-200 mb-4 shadow-lg">
+              <span className="text-4xl">📊</span>
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-800">Track</h3>
+            <p className="text-gray-600 text-base mb-1">Monitor your purchases, sales, and profits.</p>
+          </div>
+          {/* Step 4 */}
+          <div className="flex-1 glass-card bg-white/80 rounded-2xl shadow-xl p-8 flex flex-col items-center text-center animate-fade-in delay-400 hover:scale-105 transition-transform duration-300">
+            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-green-200 via-blue-200 to-purple-200 mb-4 shadow-lg">
+              <span className="text-4xl">💡</span>
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-800">Analyze</h3>
+            <p className="text-gray-600 text-base mb-1">Gain insights with beautiful dashboards and analytics.</p>
+          </div>
+        </div>
       </section>
 
 

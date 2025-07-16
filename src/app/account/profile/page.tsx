@@ -160,7 +160,7 @@ export default function ProfilePage() {
                   ref={fileInputRef}
                   disabled={uploading}
                 />
-            <button
+                <button
                   type="button"
                   className="focus:outline-none"
                   onClick={() => fileInputRef.current?.click()}
@@ -179,10 +179,10 @@ export default function ProfilePage() {
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400 text-3xl">
                         👤
-            </div>
-          )}
+                      </div>
+                    )}
                     {uploading && <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-full"><div className="animate-spin h-8 w-8 border-b-2 border-green-600"></div></div>}
-        </div>
+                  </div>
                 </button>
               </div>
               <div className="mt-3">
