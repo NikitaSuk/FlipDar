@@ -150,7 +150,4 @@ function PasswordRequirements({ password }: { password: string }) {
       </li>
     </ul>
   );
-}
-
-// export for use in the home page bubble
-export { PasswordRequirements }; 
+} 
